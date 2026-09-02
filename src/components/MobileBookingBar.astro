@@ -16,8 +16,9 @@ const from = Math.min(...Object.values(VILLA_BASE_RATE)).toLocaleString('ja-JP')
 
 <script>
   // ヒーローを抜けたところで現れる。スクロール量のみで判定する。
-  const bar = document.querySelector<HTMLElement>('[data-booking-bar]');
-  if (bar) {
+  const initBookingBar = () => {
+    const bar = document.querySelector<HTMLElement>('[data-booking-bar]');
+    if (!bar) return;
     let ticking = false;
     const update = () => {
       bar.toggleAttribute('data-visible', window.scrollY > window.innerHeight * 0.7);
@@ -33,7 +34,9 @@ const from = Math.min(...Object.values(VILLA_BASE_RATE)).toLocaleString('ja-JP')
       { passive: true },
     );
     update();
-  }
+  };
+
+  document.addEventListener('astro:page-load', initBookingBar);
 </script>
 
 <style>
@@ -83,7 +86,7 @@ const from = Math.min(...Object.values(VILLA_BASE_RATE)).toLocaleString('ja-JP')
     justify-content: center;
     min-block-size: var(--tap-min);
     padding-inline: 1.4rem;
-    background: var(--c-ember);
+    background: var(--c-ember-deep);
     color: #fff;
     font-size: var(--fs-small);
     letter-spacing: 0.1em;
@@ -91,7 +94,7 @@ const from = Math.min(...Object.values(VILLA_BASE_RATE)).toLocaleString('ja-JP')
   }
 
   .bar__cta:active {
-    background: var(--c-ember-bright);
+    background: var(--c-ember);
   }
 
   /* デスクトップではヘッダーの CTA があるため出さない */

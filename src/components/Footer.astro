@@ -78,6 +78,9 @@ const year = new Date().getFullYear();
   .footer__brand {
     --logo-size: 0.9375rem;
     justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
   }
 
   .footer__descriptor {
@@ -163,6 +166,9 @@ const year = new Date().getFullYear();
 
   .footer__notice-link {
     justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
     border-bottom: 1px solid var(--line-strong);
     padding-bottom: 2px;
     color: var(--fg-muted);

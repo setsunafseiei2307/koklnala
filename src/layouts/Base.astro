@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -85,6 +86,9 @@ const jsonLd = {
 
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
 
+    <!-- ページ間をフェードでつなぐ（prefers-reduced-motion 時は無効化） -->
+    <ClientRouter />
+
     <!-- JS 有効時のみ出現アニメーションの初期状態を適用する -->
     <script is:inline>
       document.documentElement.classList.add('js');
@@ -101,7 +105,8 @@ const jsonLd = {
 
     <script>
       import { initReveal } from '../scripts/reveal';
-      initReveal();
+
+      document.addEventListener('astro:page-load', initReveal);
     </script>
 
     <style is:global>

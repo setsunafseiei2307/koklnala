@@ -79,6 +79,17 @@ const from = Math.min(...Object.values(VILLA_BASE_RATE)).toLocaleString('ja-JP')
     opacity: 0.5;
   }
 
+  .bhead__crumb a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
+  }
+
+  .bhead__crumb li {
+    display: flex;
+    align-items: center;
+  }
+
   .bhead__crumb a:hover {
     color: var(--c-ember-bright);
   }
@@ -114,6 +125,9 @@ const from = Math.min(...Object.values(VILLA_BASE_RATE)).toLocaleString('ja-JP')
 
   .bhead__notice-link {
     justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
     border-block-end: 1px solid var(--line-strong);
     padding-block-end: 2px;
     color: var(--fg-muted);

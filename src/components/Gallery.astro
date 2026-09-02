@@ -70,7 +70,8 @@ import { imageSource } from '../lib/images';
 
 <script>
   import { initGallery } from '../scripts/gallery';
-  initGallery();
+
+  document.addEventListener('astro:page-load', initGallery);
 </script>
 
 <style>

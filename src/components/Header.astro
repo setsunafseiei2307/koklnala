@@ -88,7 +88,9 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
 
 <script>
   import { initHeader } from '../scripts/header';
-  initHeader();
+
+  // View Transitions による遷移後も初期化する
+  document.addEventListener('astro:page-load', initHeader);
 </script>
 
 <style>
@@ -223,7 +225,7 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     content: '';
     position: absolute;
     inset: 0;
-    background: var(--c-ember);
+    background: var(--c-ember-deep);
     transform-origin: bottom;
     scale: 1 0;
     transition: scale var(--dur-base) var(--ease-out);

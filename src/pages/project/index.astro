@@ -173,6 +173,17 @@ const stack = [
     color: var(--fg-faint);
   }
 
+  .phead__crumb a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
+  }
+
+  .phead__crumb li {
+    display: flex;
+    align-items: center;
+  }
+
   .phead__crumb li + li::before {
     content: '/';
     margin-inline-end: 0.55rem;

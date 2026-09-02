@@ -129,6 +129,17 @@ const { label, title, lead, image, crumb = [], objectPosition = 'center 55%' } =
     opacity: 0.5;
   }
 
+  .phero__crumb a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
+  }
+
+  .phero__crumb li {
+    display: flex;
+    align-items: center;
+  }
+
   .phero__crumb a:hover {
     color: var(--c-ember-bright);
   }

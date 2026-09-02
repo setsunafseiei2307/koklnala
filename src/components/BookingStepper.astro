@@ -359,7 +359,8 @@ const steps = [
 
 <script>
   import { initBooking } from '../scripts/booking';
-  initBooking();
+
+  document.addEventListener('astro:page-load', initBooking);
 </script>
 
 <style>
@@ -919,7 +920,7 @@ const steps = [
   .bk__bar-btn {
     min-block-size: var(--tap-min);
     padding-inline: 1.5rem;
-    background: var(--c-ember);
+    background: var(--c-ember-deep);
     color: #fff;
     font-size: var(--fs-small);
     letter-spacing: 0.1em;

@@ -18,7 +18,10 @@
     "images:import": "node --import ./scripts/ts-resolve.mjs scripts/import-images.mjs",
     "fonts": "node scripts/build-fonts.mjs",
     "assets:brand": "node scripts/generate-brand-assets.mjs",
-    "docs:images": "node --import ./scripts/ts-resolve.mjs scripts/build-image-docs.mjs"
+    "docs:images": "node --import ./scripts/ts-resolve.mjs scripts/build-image-docs.mjs",
+    "test:ui": "node scripts/e2e-ui.mjs",
+    "qa:audit": "node scripts/audit.mjs",
+    "qa:perf": "node scripts/perf.mjs"
   },
   "dependencies": {
     "astro": "^7.2.10"

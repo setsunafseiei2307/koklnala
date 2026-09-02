@@ -15,6 +15,8 @@
   --c-ivory-deep: #e6e0d4;
   --c-ember: #b87643;
   --c-ember-bright: #d18d55;
+  /* 白文字を載せる面用（#B87643 は 3.68:1 で AA に届かないため） */
+  --c-ember-deep: #a3612e;
   --c-moss: #6f7d6a;
 
   /* 役割ベース（ダーク面が既定） */

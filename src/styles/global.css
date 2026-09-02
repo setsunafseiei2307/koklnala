@@ -245,7 +245,7 @@ p {
   transition: translate var(--dur-fast) var(--ease-out);
 }
 
-.skip-link:focus-visible {
+:is(.skip-link:focus, .skip-link:focus-visible) {
   translate: -50% 0;
 }
 
@@ -314,9 +314,9 @@ p {
 }
 
 .btn--primary {
-  background-color: var(--c-ember);
+  background-color: var(--c-ember-deep);
   color: #fff;
-  border-color: var(--c-ember);
+  border-color: var(--c-ember-deep);
 }
 
 .btn--primary::after {
@@ -376,6 +376,8 @@ p {
 .link {
   display: inline-flex;
   align-items: center;
+  /* タップ領域を 44px 以上確保する */
+  min-block-size: var(--tap-min);
   gap: 0.7em;
   font-family: var(--font-en);
   font-size: var(--fs-label);
@@ -452,7 +454,40 @@ p {
   }
 }
 
+/* =========================================================
+   View Transitions（ページ遷移）
+   ========================================================= */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: page-out 260ms var(--ease-in-out) both;
+}
+
+::view-transition-new(root) {
+  animation: page-in 420ms var(--ease-out) both;
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+
   html {
     scroll-behavior: auto;
   }
