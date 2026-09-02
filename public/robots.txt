@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# 公開ドメインが確定したら、astro.config.mjs の `site` を設定したうえで
+# 以下の行を有効にしてください。
+# Sitemap: https://example.com/sitemap-index.xml

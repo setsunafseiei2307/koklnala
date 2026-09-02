@@ -81,7 +81,7 @@ const { villa, next, prev } = Astro.props;
           id={villa.interior.id}
           alt={villa.interior.alt}
           sizes="(max-width: 61.99em) 100vw, 55vw"
-          ratio="4 / 3"
+          ratio="3 / 2"
         />
         <FloorPlan villa={villa} />
       </div>
@@ -181,7 +181,8 @@ const { villa, next, prev } = Astro.props;
   .villa-page__plan {
     display: grid;
     gap: clamp(1.5rem, 3vw, 2.5rem);
-    align-items: start;
+    /* 写真と間取り図の高さが揃わないため、図は中央に置く */
+    align-items: center;
   }
 
   .villa-page__amenities {

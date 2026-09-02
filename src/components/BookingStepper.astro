@@ -19,6 +19,22 @@ const steps = [
 ];
 ---
 
+<noscript>
+  <style is:inline>
+    /* JavaScript 無効時は全ステップを開き、内容を読めるようにする */
+    .bk__panel[hidden] {
+      display: grid !important;
+    }
+
+    .bk__steps,
+    .bk__progress,
+    .bk__nav,
+    .bk__bar {
+      display: none !important;
+    }
+  </style>
+</noscript>
+
 <div class="bk" data-booking>
   <ol class="bk__steps" data-step-nav aria-label="予約のステップ">
     {
@@ -307,6 +323,12 @@ const steps = [
       </div>
     </form>
 
+    <noscript>
+      <p class="bk__noscript">
+        この予約 UI は JavaScript で動作します。現在は各ステップの内容をすべて表示しています。料金の自動計算をご覧いただくには JavaScript を有効にしてください。
+      </p>
+    </noscript>
+
     <aside class="bk__summary" aria-label="料金の概算">
       <h2 class="bk__summary-title label">RESERVATION SUMMARY</h2>
 
@@ -376,6 +398,10 @@ const steps = [
     overflow-x: auto;
     scrollbar-width: none;
     border-block-end: 1px solid var(--line);
+    position: sticky;
+    inset-block-start: calc(var(--header-h) - 1px);
+    z-index: 2;
+    background: var(--bg);
   }
 
   .bk__steps::-webkit-scrollbar {
@@ -447,6 +473,11 @@ const steps = [
   .bk__progress {
     display: grid;
     gap: 0.6rem;
+    position: sticky;
+    inset-block-start: calc(var(--header-h) - 1px);
+    z-index: 2;
+    background: var(--bg);
+    padding-block: 0.75rem;
   }
 
   .bk__progress-text {
@@ -498,6 +529,8 @@ const steps = [
   .bk__panel {
     display: grid;
     gap: clamp(1.25rem, 2.5vw, 1.75rem);
+    /* 追従するステップナビの下に見出しが隠れないようにする */
+    scroll-margin-top: calc(var(--header-h) + 5rem);
   }
 
   .bk__panel-title {
@@ -798,6 +831,14 @@ const steps = [
     translate: 0 0.35em;
   }
 
+  .bk__noscript {
+    padding: var(--sp-m);
+    border: 1px solid var(--c-ember);
+    font-size: var(--fs-small);
+    line-height: 1.85;
+    color: var(--fg-muted);
+  }
+
   .bk__notice {
     display: grid;
     gap: 0.4rem;
@@ -818,6 +859,12 @@ const steps = [
 
   .bk__nav .btn {
     flex: 1 1 10rem;
+  }
+
+  @media (min-width: 48em) {
+    .bk__nav .btn {
+      flex: 0 1 15rem;
+    }
   }
 
   .bk__done {
@@ -949,6 +996,10 @@ const steps = [
   }
 
   @media (min-width: 62em) {
+    .bk__panel {
+      scroll-margin-top: calc(var(--header-h) + 7.5rem);
+    }
+
     .bk__progress {
       display: none;
     }

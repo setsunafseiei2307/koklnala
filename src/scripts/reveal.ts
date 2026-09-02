@@ -50,5 +50,4 @@ export function initReveal(): void {
 function markVisible(element: HTMLElement): void {
   if (element.hasAttribute('data-reveal')) element.setAttribute('data-reveal', 'is-in');
   if (element.hasAttribute('data-reveal-mask')) element.setAttribute('data-reveal-mask', 'is-in');
-  element.style.willChange = '';
 }

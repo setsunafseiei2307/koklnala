@@ -59,22 +59,20 @@ for (const viewport of VIEWPORTS) {
       messages.push(`status ${response.status()}`);
     }
 
-    // 遅延読み込みの画像を出すため一度最下部まで送る
+    // 遅延読み込みの画像と出現アニメーションを起こすため、最下部まで実際に送る。
+    // scroll-behavior: smooth が効くと目的地に届かないため instant を明示する。
     await page.evaluate(async () => {
-      await new Promise((resolve) => {
-        let y = 0;
-        const step = () => {
-          y += window.innerHeight * 0.8;
-          window.scrollTo(0, y);
-          if (y < document.body.scrollHeight) requestAnimationFrame(step);
-          else resolve(undefined);
-        };
-        step();
-      });
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      const max = () => document.documentElement.scrollHeight - window.innerHeight;
+      for (let y = 0; y <= max(); y += window.innerHeight * 0.7) {
+        window.scrollTo({ top: y, behavior: 'instant' });
+        await wait(60);
+      }
+      window.scrollTo({ top: max(), behavior: 'instant' });
+      await wait(200);
+      window.scrollTo({ top: 0, behavior: 'instant' });
     });
-    await page.waitForTimeout(500);
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(700);
+    await page.waitForTimeout(1400);
 
     const audit = await page.evaluate(() => {
       const doc = document.documentElement;

@@ -242,8 +242,9 @@ export function initBooking(): void {
     submitButton.hidden = !isLast;
     mobileNext.textContent = isLast ? 'この内容で予約する' : '次へ進む';
 
+    // ステップが変わったら、そのパネルの先頭が追従ナビの下に来るようスクロールする
     form.querySelector<HTMLElement>(`[data-panel="${STEPS[currentIndex]}"]`)?.scrollIntoView({
-      block: 'nearest',
+      block: 'start',
     });
   }
 

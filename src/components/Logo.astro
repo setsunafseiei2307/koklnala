@@ -1,16 +1,15 @@
 ---
 interface Props {
   class?: string;
-  /** 見出し内で使う場合はテキストを装飾扱いにする */
-  as?: 'span' | 'div';
 }
-const { class: className = '', as: Tag = 'span' } = Astro.props;
+
+const { class: className = '' }: Props = Astro.props;
 ---
 
-<Tag class:list={['logo', className]}>
+<span class:list={['logo', className]}>
   <span class="logo__mark" aria-hidden="true"></span>
   <span class="logo__text">EMBER<span class="logo__amp">&amp;</span>MOSS</span>
-</Tag>
+</span>
 
 <style>
   .logo {
