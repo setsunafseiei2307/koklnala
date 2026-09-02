@@ -25,7 +25,7 @@ const decisions = [
   {
     no: '04',
     title: '写真が主役でも速度を落とさない',
-    body: 'AVIF / WebP の自動生成、srcset と sizes の指定、LCP 画像のみ eager 読み込み。日本語フォントはサイト内で使う文字だけにサブセット化し、フルセットの約 1/10 に抑えています。',
+    body: 'AVIF / WebP の自動生成、srcset と sizes の指定、LCP 画像のみ eager 読み込み。日本語フォントはサイト内で使う文字だけにサブセット化し、フルセット 3.2MB を約 375KB（約 1/8）に抑えています。',
   },
   {
     no: '05',
@@ -38,7 +38,7 @@ const stack = [
   { label: 'Framework', value: 'Astro（静的出力）' },
   { label: 'Language', value: 'TypeScript（strict）' },
   { label: 'Styling', value: 'CSS カスタムプロパティによる自作デザインシステム' },
-  { label: 'JavaScript', value: '約 8KB（gzip）/ UI ライブラリ・アニメーションライブラリなし' },
+  { label: 'JavaScript', value: '約 13〜16KB（gzip）/ UI ライブラリ・アニメーションライブラリなし' },
   { label: 'Images', value: 'astro:assets による AVIF / WebP 生成' },
   { label: 'Fonts', value: 'Jost / Zen Kaku Gothic New / しっぽり明朝（サブセット自己ホスト）' },
   { label: 'Testing', value: 'Vitest（料金ロジック）/ Playwright（表示・横スクロール検証）' },

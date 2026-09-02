@@ -40,12 +40,17 @@ const LATIN_VARIABLE = {
 /** 走査対象の拡張子 */
 const EXTENSIONS = new Set(['.astro', '.ts', '.tsx', '.md', '.mdx', '.html', '.css']);
 
+/** 画面に出ないビルド専用データは走査対象から外す */
+const EXCLUDED = new Set(['src/data/image-briefs.ts']);
+
 async function collectFiles(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
   const files = await Promise.all(
     entries.map(async (entry) => {
       const full = path.join(dir, entry.name);
       if (entry.isDirectory()) return collectFiles(full);
+      const relative = path.relative(root, full).split(path.sep).join('/');
+      if (EXCLUDED.has(relative)) return [];
       return EXTENSIONS.has(path.extname(entry.name)) ? [full] : [];
     }),
   );
