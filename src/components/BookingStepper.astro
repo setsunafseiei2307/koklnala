@@ -113,6 +113,16 @@ const steps = [
         </div>
 
         <p class="bk__checkout small" data-checkout-note></p>
+
+        <div class="bk__vacancy" data-vacancy hidden>
+          <p class="bk__vacancy-head">
+            <span class="label">VACANCY</span>
+            <span class="bk__vacancy-summary" data-vacancy-summary></span>
+          </p>
+          <ul class="bk__vacancy-list" data-vacancy-list></ul>
+          <p class="bk__vacancy-note small">空室状況はデモ用の架空データです（日付ごとに固定の結果を返します）。</p>
+        </div>
+        <p class="bk__error small" data-error="vacancy" role="alert"></p>
       </section>
 
       <!-- STEP 02 : 人数 -->
@@ -168,6 +178,7 @@ const steps = [
                     <span class="bk__card-name font-en">{villa.name}</span>
                     <span class="bk__card-price num">{yen(villaFromRate(villa.id))}〜</span>
                   </span>
+                  <span class="bk__card-status" data-villa-status hidden></span>
                   <span class="bk__card-tagline">{villa.tagline}</span>
                   <span class="bk__card-meta small">
                     定員 {villa.capacity.max} 名 / {villa.area} / {villa.sauna}
@@ -778,6 +789,79 @@ const steps = [
 
   .bk__card-warning {
     color: #e0a48c;
+  }
+
+  .bk__card-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    font-size: var(--fs-label);
+    letter-spacing: 0.1em;
+    color: var(--fg-muted);
+  }
+
+  .bk__card-status::before {
+    content: '';
+    inline-size: 6px;
+    block-size: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .bk__card-status[data-status='available'] {
+    color: #8fae86;
+  }
+
+  .bk__card-status[data-status='few'] {
+    color: var(--c-ember-bright);
+  }
+
+  .bk__card-status[data-status='full'] {
+    color: #b98d84;
+  }
+
+  .bk__vacancy {
+    display: grid;
+    gap: 0.75rem;
+    padding: var(--sp-m);
+    border: 1px solid var(--line);
+    background: var(--bg-raised);
+  }
+
+  .bk__vacancy-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.9rem;
+  }
+
+  .bk__vacancy-summary {
+    font-size: var(--fs-small);
+    letter-spacing: 0.06em;
+  }
+
+  .bk__vacancy-list {
+    display: grid;
+    gap: 0.4rem;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  }
+
+  .bk__vacancy-list li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-block: 0.45rem;
+    border-block-end: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+
+  .bk__vacancy-list .bk__card-status {
+    white-space: nowrap;
+  }
+
+  .bk__vacancy-note {
+    color: var(--fg-faint);
   }
 
   .bk__review {

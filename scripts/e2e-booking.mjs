@@ -5,6 +5,16 @@
  */
 import { chromium } from 'playwright';
 import { estimate, yen } from '../src/lib/pricing.ts';
+import { availabilityFor, availabilityForAll } from '../src/lib/availability.ts';
+
+/** 条件に合う日付を、明後日以降から探す */
+function findDate(predicate) {
+  for (let offset = 2; offset < 400; offset += 1) {
+    const iso = new Date(Date.now() + offset * 864e5).toISOString().slice(0, 10);
+    if (predicate(iso)) return iso;
+  }
+  throw new Error('条件に合う日付が見つかりませんでした');
+}
 
 const BASE = process.env.BASE_URL ?? 'http://localhost:4321';
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_PATH;
@@ -43,12 +53,26 @@ await page.fill('#check-in', '2020-01-01');
 await page.click('[data-next-mobile]');
 check('過去日を弾く', (await page.textContent('[data-error="checkIn"]'))?.includes('以降'));
 
-const future = new Date(Date.now() + 40 * 864e5).toISOString().slice(0, 10);
+// STONE VILLA に 2 泊できる日を探す（空室状況は日付から決定的に決まる）
+const future = findDate((iso) => availabilityFor(iso, 'stone', 2) !== 'full');
 await page.fill('#check-in', future);
-await page.click('[data-step-control="nights"][data-delta="1"]'); // 2泊
-await page.click('[data-next-mobile]');
-check('STEP 02 へ進む', await page.isVisible('[data-panel="guests"]'));
+await page.fill('[data-input="nights"]', '2');
+await page.waitForTimeout(150);
 check('チェックアウト日が表示される', (await page.textContent('[data-checkout-note]'))?.includes('チェックアウト'));
+
+check('空室サマリーが表示される', (await page.textContent('[data-vacancy-summary]'))?.includes('空室'));
+
+// 3 棟とも満室の日はステップを進めない
+const fullDate = findDate((iso) => availabilityForAll(iso, 1).every((entry) => entry.status === 'full'));
+await page.fill('#check-in', fullDate);
+await page.fill('[data-input="nights"]', '1');
+await page.click('[data-next-mobile]');
+check('全棟満室の日程は先へ進めない', (await page.textContent('[data-error="vacancy"]'))?.includes('満室'));
+
+await page.fill('#check-in', future);
+await page.fill('[data-input="nights"]', '2');
+await page.click('[data-next-mobile]');
+check('空室のある日程なら進める', await page.isVisible('[data-panel="guests"]'));
 
 // STEP 02: 4名へ
 await page.click('[data-step-control="guests"][data-delta="1"]');

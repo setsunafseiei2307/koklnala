@@ -10,6 +10,12 @@ import { estimate, normalizeStay, yen, type StayInput } from '../lib/pricing';
 import { getVilla, VILLAS } from '../data/villas';
 import { MEAL_PLANS, STAY_OPTIONS, type MealPlanId, type VillaId } from '../data/pricing';
 import { persistStay, readStay, syncUrl } from './stay-state';
+import {
+  AVAILABILITY_LABEL,
+  availabilityFor,
+  availabilityForAll,
+  type Availability,
+} from '../lib/availability';
 
 type StepId = 'dates' | 'guests' | 'villa' | 'meals' | 'confirm';
 
@@ -71,6 +77,10 @@ export function initBooking(): void {
     else if (target === checkInInput) {
       checkIn = target.value;
       clearError('checkIn');
+      clearError('vacancy');
+      // 日程が変わると空室状況も変わるため、棟の選択肢を評価し直す
+      switchAwayFromFullVilla();
+      applyStateToForm();
       render();
     } else if (target.name === 'agree') clearError('agree');
   });
@@ -121,8 +131,55 @@ export function initBooking(): void {
   // --- 関数 ---------------------------------------------------------------
   function update(patch: Partial<StayInput>): void {
     stay = normalizeStay({ ...stay, ...patch });
+    switchAwayFromFullVilla();
     applyStateToForm();
     render();
+  }
+
+  /** 選択中の棟が満室になったら、空いている棟へ寄せる */
+  function switchAwayFromFullVilla(): void {
+    if (!checkIn) return;
+    if (availabilityFor(checkIn, stay.villaId, stay.nights) !== 'full') return;
+    const alternative = availabilityForAll(checkIn, stay.nights).find(
+      (entry) => entry.status !== 'full' && getVilla(entry.villaId).capacity.max >= stay.guests,
+    );
+    if (alternative) stay = normalizeStay({ ...stay, villaId: alternative.villaId });
+  }
+
+  /** STEP 01 の空室サマリーを描画する */
+  function renderVacancy(): void {
+    const panel = form.querySelector<HTMLElement>('[data-vacancy]');
+    const list = form.querySelector<HTMLElement>('[data-vacancy-list]');
+    const summary = form.querySelector<HTMLElement>('[data-vacancy-summary]');
+    if (!panel || !list || !summary) return;
+
+    if (!checkIn) {
+      panel.hidden = true;
+      return;
+    }
+
+    const entries = availabilityForAll(checkIn, stay.nights);
+    const open = entries.filter((entry) => entry.status !== 'full').length;
+    summary.textContent =
+      open === 0
+        ? 'この日程は 3 棟とも満室です'
+        : `${formatDate(parseDate(checkIn))} から ${stay.nights} 泊 — 空室 ${open} 棟`;
+
+    list.replaceChildren(
+      ...entries.map((entry) => {
+        const item = document.createElement('li');
+        const name = document.createElement('span');
+        name.className = 'font-en';
+        name.textContent = getVilla(entry.villaId).name;
+        const badge = document.createElement('span');
+        badge.className = 'bk__card-status';
+        badge.dataset.status = entry.status;
+        badge.textContent = AVAILABILITY_LABEL[entry.status as Availability];
+        item.append(name, badge);
+        return item;
+      }),
+    );
+    panel.hidden = false;
   }
 
   function readOptions(): string[] {
@@ -136,12 +193,26 @@ export function initBooking(): void {
     nightsInput.value = String(stay.nights);
 
     for (const input of form.querySelectorAll<HTMLInputElement>('input[name="villa"]')) {
-      const villa = getVilla(input.value as VillaId);
+      const villaId = input.value as VillaId;
+      const villa = getVilla(villaId);
       const fits = villa.capacity.max >= stay.guests;
-      input.disabled = !fits;
+      const status = checkIn ? availabilityFor(checkIn, villaId, stay.nights) : null;
+      const bookable = fits && status !== 'full';
+
+      input.disabled = !bookable;
       input.checked = input.value === stay.villaId;
+
       const card = input.closest<HTMLElement>('[data-villa-card]');
       card?.querySelector<HTMLElement>('[data-villa-warning]')?.toggleAttribute('hidden', fits);
+
+      const badge = card?.querySelector<HTMLElement>('[data-villa-status]');
+      if (badge) {
+        badge.hidden = status === null;
+        if (status) {
+          badge.dataset.status = status;
+          badge.textContent = status === 'full' ? 'この日程は満室です' : AVAILABILITY_LABEL[status];
+        }
+      }
     }
 
     for (const input of form.querySelectorAll<HTMLInputElement>('input[name="meal"]')) {
@@ -204,6 +275,8 @@ export function initBooking(): void {
       '[data-review="options"]',
       result.optionLines.length > 0 ? result.optionLines.map((line) => line.label).join(' / ') : 'なし',
     );
+
+    renderVacancy();
 
     persistStay({ ...stay, checkIn: checkIn || undefined });
     syncUrl({ ...stay, checkIn: checkIn || undefined });
@@ -269,6 +342,12 @@ export function initBooking(): void {
       if (selected < minDate) {
         return fail('checkIn', checkInInput, `${formatDate(minDate)} 以降の日付をお選びください。`);
       }
+      const open = availabilityForAll(checkInInput.value, stay.nights).filter(
+        (entry) => entry.status !== 'full',
+      );
+      if (open.length === 0) {
+        return fail('vacancy', null, 'この日程は 3 棟とも満室です。日付か泊数を変更してください。');
+      }
       return true;
     }
 
@@ -276,6 +355,9 @@ export function initBooking(): void {
       const villa = getVilla(stay.villaId);
       if (villa.capacity.max < stay.guests) {
         return fail('villa', null, `${stay.guests} 名で宿泊できる棟をお選びください。`);
+      }
+      if (checkIn && availabilityFor(checkIn, stay.villaId, stay.nights) === 'full') {
+        return fail('villa', null, 'この日程で空いている棟をお選びください。');
       }
       return true;
     }

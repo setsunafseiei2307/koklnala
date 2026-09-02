@@ -6,6 +6,7 @@ import {
   normalizeStay,
   yen,
 } from '../src/lib/pricing';
+import { availabilityFor, availabilityForAll, vacantCount } from '../src/lib/availability';
 import {
   BATHING_TAX_PER_GUEST_NIGHT,
   EXTRA_GUEST_RATE,
@@ -141,3 +142,67 @@ describe('yen / 表示フォーマット', () => {
     expect(yen(-1200)).toBe('¥-1,200');
   });
 });
+
+describe('availability / 空室状況（デモ用の決定的データ）', () => {
+  it('同じ日付とヴィラなら常に同じ結果を返す', () => {
+    const first = availabilityFor('2026-10-10', 'forest');
+    for (let index = 0; index < 5; index += 1) {
+      expect(availabilityFor('2026-10-10', 'forest')).toBe(first);
+    }
+  });
+
+  it('ヴィラごとに結果が分かれる日がある', () => {
+    const days = ['2026-10-10', '2026-10-11', '2026-11-03', '2026-12-24'];
+    const patterns = days.map((day) => availabilityForAll(day).map((entry) => entry.status).join('/'));
+    expect(new Set(patterns).size).toBeGreaterThan(1);
+  });
+
+  it('連泊は期間内で最も厳しい状態になる', () => {
+    const date = findDate((day) => availabilityFor(day, 'forest') === 'full');
+    const previous = shiftDate(date, -1);
+    // 前日から 2 泊すると、満室の日を含むため満室になる
+    expect(availabilityFor(previous, 'forest', 2)).toBe('full');
+  });
+
+  it('不正な日付では予約を止めない', () => {
+    expect(availabilityFor('', 'forest')).toBe('available');
+    expect(availabilityFor('not-a-date', 'stone')).toBe('available');
+  });
+
+  it('1 年を通して満室ばかり／空室ばかりに偏らない', () => {
+    let full = 0;
+    let total = 0;
+    for (let index = 0; index < 365; index += 1) {
+      const day = shiftDate('2026-04-01', index);
+      for (const entry of availabilityForAll(day)) {
+        total += 1;
+        if (entry.status === 'full') full += 1;
+      }
+    }
+    const ratio = full / total;
+    expect(ratio).toBeGreaterThan(0.1);
+    expect(ratio).toBeLessThan(0.4);
+  });
+
+  it('少なくとも 1 棟が空いている日が大半を占める', () => {
+    let openDays = 0;
+    for (let index = 0; index < 120; index += 1) {
+      if (vacantCount(shiftDate('2026-04-01', index)) > 0) openDays += 1;
+    }
+    expect(openDays).toBeGreaterThan(100);
+  });
+});
+
+function shiftDate(iso: string, days: number): string {
+  const date = new Date(`${iso}T00:00:00`);
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function findDate(predicate: (iso: string) => boolean): string {
+  for (let index = 0; index < 400; index += 1) {
+    const day = shiftDate('2026-04-01', index);
+    if (predicate(day)) return day;
+  }
+  throw new Error('条件に合う日付が見つかりませんでした');
+}
