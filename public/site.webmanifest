@@ -1,0 +1,22 @@
+{
+  "name": "EMBER & MOSS",
+  "short_name": "EMBER & MOSS",
+  "description": "箱根・仙石原の森に建つプライベートヴィラ（コンセプトプロジェクト）",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0C0E0D",
+  "theme_color": "#0C0E0D",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

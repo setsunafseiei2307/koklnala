@@ -1,0 +1,128 @@
+---
+import Figure from '../Figure.astro';
+import SectionHeading from '../SectionHeading.astro';
+import { SAUNA_ELEMENTS } from '../../data/sauna';
+---
+
+<section class="sauna section on-forest" id="sauna" aria-labelledby="sauna-title">
+  <div class="shell sauna__grid">
+    <div class="sauna__media">
+      <Figure id="sauna-interior" sizes="(max-width: 61.99em) 100vw, 46vw" ratio="4 / 5" />
+      <Figure
+        id="cold-bath"
+        sizes="(max-width: 61.99em) 45vw, 22vw"
+        ratio="1 / 1"
+        class="sauna__media-sub"
+      />
+    </div>
+
+    <div class="sauna__content">
+      <SectionHeading
+      id="sauna-title"
+        index="03"
+        label="PRIVATE SAUNA"
+        title="整えるためではなく、静かになるために。"
+        lead="サウナ、水風呂、外気浴。ひとつずつの温度と距離を決めてから、建物の配置を決めました。共用サウナはありません。"
+      />
+
+      <ol class="sauna__elements">
+        {
+          SAUNA_ELEMENTS.map((element, index) => (
+            <li class="sauna__element" data-reveal style={`--reveal-delay:${index * 80}ms`}>
+              <div class="sauna__element-head">
+                <span class="sauna__element-label font-en">{element.label}</span>
+                <span class="sauna__element-value num">{element.value}</span>
+              </div>
+              <p class="sauna__element-body small">{element.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <a class="link sauna__link" href="/sauna/">
+        <span>サウナについて詳しく</span>
+        <span class="link__arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sauna__grid {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 4.5rem);
+  }
+
+  .sauna__media {
+    position: relative;
+    padding-block-end: clamp(3rem, 8vw, 5rem);
+  }
+
+  .sauna__media > :global(.sauna__media-sub) {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-end: 0;
+    inline-size: min(46%, 15rem);
+    border: 6px solid var(--bg);
+  }
+
+  .sauna__content {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3rem);
+    align-content: start;
+  }
+
+  .sauna__elements {
+    display: grid;
+    gap: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .sauna__element {
+    display: grid;
+    gap: 0.5rem;
+    padding-block: clamp(1rem, 2.4vw, 1.5rem);
+    border-block-end: 1px solid var(--line);
+  }
+
+  .sauna__element-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-s);
+  }
+
+  .sauna__element-label {
+    font-size: clamp(1rem, 2.6vw, 1.25rem);
+    letter-spacing: 0.22em;
+    color: var(--fg);
+  }
+
+  .sauna__element-value {
+    font-size: var(--fs-small);
+    letter-spacing: 0.1em;
+    color: var(--c-ember-bright);
+    white-space: nowrap;
+  }
+
+  .sauna__element-body {
+    max-inline-size: 40em;
+  }
+
+  .sauna__link {
+    justify-self: start;
+  }
+
+  @media (min-width: 62em) {
+    .sauna__grid {
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+      align-items: center;
+    }
+
+    .sauna__media {
+      position: sticky;
+      top: calc(var(--header-h) + 2.5rem);
+    }
+  }
+</style>

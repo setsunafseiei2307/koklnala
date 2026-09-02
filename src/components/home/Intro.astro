@@ -1,0 +1,145 @@
+---
+import Figure from '../Figure.astro';
+
+const steps = [
+  { en: 'LEAVE', ja: '都市を離れる。', note: '東名を降りて 25 分。林道に入ると、対向車も来なくなります。' },
+  { en: 'FIRE', ja: '火に触れる。', note: '薪を割り、火を入れる。整うまでの 1 時間も含めて滞在です。' },
+  { en: 'FOREST', ja: '森を見る。', note: '窓は大きく、家具は低く。視線が外へ抜けるように置いています。' },
+  { en: 'SLEEP', ja: '静かに眠る。', note: '隣の棟までは 80 メートル。夜に聞こえるのは風の音だけです。' },
+];
+---
+
+<section class="intro section on-light" id="intro" aria-labelledby="intro-title">
+  <div class="shell intro__grid">
+    <div class="intro__lead">
+      <p class="intro__meta">
+        <span class="num intro__index">01</span>
+        <span class="label">INTRODUCTION</span>
+      </p>
+      <h2 class="intro__title font-mincho h1" id="intro-title" data-reveal>
+        ホテルではなく、<br />森のなかの一棟。
+      </h2>
+      <div class="intro__body" data-reveal style="--reveal-delay:120ms">
+        <p class="body">
+          EMBER &amp; MOSS は、箱根・仙石原の斜面に 3 棟だけ建つ宿を想定したコンセプトです。ロビーもレストラン棟もありません。到着したら、そのまま自分の棟に入ります。
+        </p>
+        <p class="body">
+          設備を足すのではなく、減らす方向で設計しました。残したのは、火と、湯と、水と、森だけです。
+        </p>
+      </div>
+    </div>
+
+    <ol class="intro__steps">
+      {
+        steps.map((step, index) => (
+          <li class="intro__step" data-reveal style={`--reveal-delay:${index * 90}ms`}>
+            <span class="intro__step-en label">{step.en}</span>
+            <p class="intro__step-ja font-mincho">{step.ja}</p>
+            <p class="intro__step-note small">{step.note}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="intro__figure">
+      <Figure
+        id="architecture-detail"
+        sizes="(max-width: 47.99em) 100vw, 34vw"
+        ratio="4 / 5"
+        caption="焼き杉と安山岩の取り合い"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .intro__grid {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 4.5rem);
+  }
+
+  .intro__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: var(--sp-m);
+  }
+
+  .intro__index {
+    font-size: var(--fs-label);
+    letter-spacing: 0.2em;
+    color: var(--accent);
+  }
+
+  .intro__title {
+    letter-spacing: 0.08em;
+    line-height: 1.42;
+  }
+
+  .intro__body {
+    margin-top: var(--sp-l);
+    max-inline-size: 32em;
+  }
+
+  .intro__steps {
+    display: grid;
+    gap: 0;
+    border-block-start: 1px solid var(--line);
+    margin: 0;
+  }
+
+  .intro__step {
+    display: grid;
+    gap: 0.35rem;
+    padding-block: clamp(1.1rem, 2.5vw, 1.6rem);
+    border-block-end: 1px solid var(--line);
+    grid-template-columns: 5.5rem 1fr;
+    align-items: baseline;
+    column-gap: var(--sp-m);
+  }
+
+  .intro__step-en {
+    grid-row: span 2;
+    color: var(--fg-faint);
+  }
+
+  .intro__step-ja {
+    font-size: clamp(1.25rem, 3.4vw, 1.75rem);
+    letter-spacing: 0.1em;
+    line-height: 1.5;
+  }
+
+  .intro__step-note {
+    color: var(--fg-muted);
+    max-inline-size: 34em;
+  }
+
+  .intro__figure {
+    justify-self: start;
+    inline-size: min(100%, 26rem);
+  }
+
+  @media (min-width: 62em) {
+    .intro__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      column-gap: clamp(3rem, 6vw, 7rem);
+      align-items: start;
+    }
+
+    .intro__lead {
+      grid-column: 1;
+      position: sticky;
+      top: calc(var(--header-h) + 3rem);
+    }
+
+    .intro__steps {
+      grid-column: 2;
+    }
+
+    .intro__figure {
+      grid-column: 1;
+      inline-size: min(100%, 24rem);
+      margin-top: calc(var(--sp-xl) * -1);
+    }
+  }
+</style>

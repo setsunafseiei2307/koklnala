@@ -1,0 +1,266 @@
+---
+import { Picture } from 'astro:assets';
+import { GALLERY } from '../data/gallery';
+import { imageSource } from '../lib/images';
+---
+
+<div class="gallery" data-gallery>
+  <div class="gallery__head shell">
+    <p class="gallery__hint small">横にスクロール、または画像をタップで拡大できます</p>
+    <div class="gallery__nav">
+      <button class="gallery__arrow" type="button" data-gallery-nav="prev" aria-label="前の写真へ">
+        <span aria-hidden="true">←</span>
+      </button>
+      <button class="gallery__arrow" type="button" data-gallery-nav="next" aria-label="次の写真へ">
+        <span aria-hidden="true">→</span>
+      </button>
+    </div>
+  </div>
+
+  <ul
+    class="gallery__track"
+    data-gallery-track
+    tabindex="0"
+    role="region"
+    aria-label="ギャラリー（左右にスクロールできます）"
+  >
+    {
+      GALLERY.map((image, index) => (
+        <li class="gallery__item" style={`--ratio:${image.ratio}`}>
+          <button
+            class="gallery__button"
+            type="button"
+            data-gallery-item
+            data-caption={image.caption}
+            aria-label={`${image.caption} の写真を拡大する`}
+          >
+            <Picture
+              src={imageSource(image.id)}
+              alt={image.alt}
+              formats={['avif', 'webp']}
+              fallbackFormat="webp"
+              widths={[400, 640, 900, 1280]}
+              sizes="(max-width: 47.99em) 70vw, 32vw"
+              loading={index < 2 ? 'eager' : 'lazy'}
+              decoding="async"
+              class="gallery__img"
+            />
+            <span class="gallery__caption small">{image.caption}</span>
+          </button>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<dialog class="lightbox" data-lightbox aria-label="写真の拡大表示">
+  <div class="lightbox__inner">
+    <img class="lightbox__img" data-lightbox-img alt="" />
+    <div class="lightbox__bar">
+      <p class="lightbox__caption small" data-lightbox-caption></p>
+      <p class="lightbox__counter num" data-lightbox-counter></p>
+      <div class="lightbox__nav">
+        <button type="button" data-lightbox-nav="prev" aria-label="前の写真">←</button>
+        <button type="button" data-lightbox-nav="next" aria-label="次の写真">→</button>
+        <button type="button" data-lightbox-close aria-label="閉じる">CLOSE</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  import { initGallery } from '../scripts/gallery';
+  initGallery();
+</script>
+
+<style>
+  .gallery__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-m);
+    margin-bottom: var(--sp-m);
+  }
+
+  .gallery__hint {
+    color: var(--fg-faint);
+  }
+
+  .gallery__nav {
+    display: none;
+    gap: 0.5rem;
+  }
+
+  .gallery__arrow {
+    inline-size: var(--tap-min);
+    block-size: var(--tap-min);
+    border: 1px solid var(--line-strong);
+    color: var(--fg);
+    display: grid;
+    place-items: center;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out),
+      opacity var(--dur-fast) var(--ease-out);
+  }
+
+  .gallery__arrow:hover:not([disabled]) {
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  .gallery__arrow[disabled] {
+    opacity: 0.28;
+    cursor: not-allowed;
+  }
+
+  .gallery__track {
+    display: flex;
+    gap: clamp(0.75rem, 1.6vw, 1.25rem);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--page-gutter);
+    padding-inline: var(--page-gutter);
+    padding-block-end: var(--sp-s);
+    margin: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+    overscroll-behavior-x: contain;
+  }
+
+  /* 高さを揃え、幅を比率で変える。上下の線が揃い写真の並びが落ち着く */
+  .gallery__item {
+    flex: 0 0 auto;
+    block-size: clamp(16rem, 42vh, 26rem);
+    scroll-snap-align: start;
+  }
+
+  .gallery__button {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 0.6rem;
+    block-size: 100%;
+    text-align: start;
+    padding: 0;
+  }
+
+  .gallery__button picture {
+    display: contents;
+  }
+
+  .gallery__img {
+    block-size: 100%;
+    inline-size: auto;
+    min-block-size: 0;
+    aspect-ratio: var(--ratio);
+    object-fit: cover;
+    transition: scale var(--dur-slow) var(--ease-out), filter var(--dur-slow) var(--ease-out);
+  }
+
+  .gallery__button:hover .gallery__img,
+  .gallery__button:focus-visible .gallery__img {
+    scale: 1.03;
+    filter: brightness(1.06);
+  }
+
+  .gallery__item {
+    overflow: hidden;
+  }
+
+  .gallery__caption {
+    color: var(--fg-faint);
+    font-family: var(--font-en);
+    letter-spacing: 0.12em;
+    font-size: var(--fs-label);
+  }
+
+  /* ---- ライトボックス ---- */
+  .lightbox {
+    inline-size: min(100vw, 1400px);
+    max-inline-size: 100vw;
+    block-size: 100dvh;
+    max-block-size: 100dvh;
+    border: none;
+    padding: 0;
+    background: rgba(8, 10, 9, 0.97);
+    color: var(--c-ivory);
+  }
+
+  .lightbox::backdrop {
+    background: rgba(8, 10, 9, 0.9);
+  }
+
+  .lightbox__inner {
+    block-size: 100%;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: var(--sp-s);
+    padding: clamp(1rem, 3vw, 2rem);
+  }
+
+  .lightbox__img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: contain;
+  }
+
+  .lightbox__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-s);
+    border-top: 1px solid var(--line);
+    padding-top: var(--sp-s);
+  }
+
+  .lightbox__caption {
+    font-family: var(--font-en);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--c-stone);
+  }
+
+  .lightbox__counter {
+    font-size: var(--fs-label);
+    letter-spacing: 0.2em;
+    color: var(--fg-faint);
+  }
+
+  .lightbox__nav {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .lightbox__nav button {
+    min-inline-size: var(--tap-min);
+    min-block-size: var(--tap-min);
+    padding-inline: 0.9rem;
+    border: 1px solid var(--line-strong);
+    font-family: var(--font-en);
+    font-size: var(--fs-label);
+    letter-spacing: 0.16em;
+    color: var(--c-ivory);
+  }
+
+  .lightbox__nav button:hover {
+    background: var(--c-ivory);
+    color: var(--c-obsidian);
+  }
+
+  @media (min-width: 62em) {
+    .gallery__nav {
+      display: flex;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gallery__track {
+      scroll-behavior: auto;
+    }
+
+    .gallery__button:hover .gallery__img {
+      scale: 1;
+    }
+  }
+</style>

@@ -1,0 +1,337 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Figure from '../../components/Figure.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import FinalCta from '../../components/FinalCta.astro';
+import { SAUNA_ELEMENTS, SAUNA_RITUAL, SAUNA_SPECS } from '../../data/sauna';
+---
+
+<Base
+  title="PRIVATE SAUNA / サウナ"
+  description="全 3 棟に専用サウナ。セルフロウリュ、90 – 100℃、井戸水の水風呂 12 – 15℃、森の外気浴。共用サウナのない一棟貸しの整い方をご案内します。"
+>
+  <PageHero
+    label="PRIVATE SAUNA"
+    title="順番を待たない、サウナ。"
+    lead="共用サウナはありません。3 棟それぞれに専用のサウナと水風呂、外気浴の場所があります。時間も、温度も、湿度も、その日の自分に合わせてください。"
+    image="sauna-interior"
+    objectPosition="center 50%"
+  />
+
+  <section class="section on-light" aria-labelledby="elem-title">
+    <div class="shell">
+      <div class="sauna-page__head">
+        <SectionHeading
+          id="elem-title"
+          index="01"
+          label="FOUR ELEMENTS"
+          title="熱、水、外気、静けさ。"
+          lead="4 つの条件を先に決めて、そこから建物の配置を決めました。どれかひとつが欠けると、うまく整いません。"
+        />
+      </div>
+
+      <ol class="sauna-page__elements">
+        {
+          SAUNA_ELEMENTS.map((element, index) => (
+            <li class="sauna-page__element" data-reveal style={`--reveal-delay:${index * 70}ms`}>
+              <p class="sauna-page__element-no num">{String(index + 1).padStart(2, '0')}</p>
+              <h3 class="sauna-page__element-label font-en">{element.label}</h3>
+              <p class="sauna-page__element-ja label">{element.labelJa}</p>
+              <p class="sauna-page__element-value num">{element.value}</p>
+              <p class="sauna-page__element-body small">{element.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section on-forest" aria-labelledby="ritual-title">
+    <div class="shell sauna-page__ritual-grid">
+      <div class="sauna-page__ritual-head">
+        <SectionHeading
+          id="ritual-title"
+          index="02"
+          label="THE RITUAL"
+          title="ひととおりの流れ。"
+          lead="決まりごとではありません。はじめての方のための、目安です。"
+        />
+        <Figure id="sauna-stove" sizes="(max-width: 61.99em) 100vw, 32vw" ratio="3 / 4" />
+      </div>
+
+      <ol class="sauna-page__ritual">
+        {
+          SAUNA_RITUAL.map((step) => (
+            <li class="sauna-page__step" data-reveal>
+              <div class="sauna-page__step-head">
+                <span class="sauna-page__step-no num">{step.no}</span>
+                <h3 class="sauna-page__step-title">{step.title}</h3>
+                {step.time && <span class="sauna-page__step-time num">{step.time}</span>}
+              </div>
+              <p class="small">{step.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--tight on-stone" aria-labelledby="water-title">
+    <div class="shell sauna-page__water">
+      <Figure id="cold-bath" sizes="(max-width: 47.99em) 100vw, 46vw" ratio="3 / 2" />
+      <Figure id="outdoor-rest" sizes="(max-width: 47.99em) 100vw, 30vw" ratio="3 / 4" class="sauna-page__water-sub" />
+      <div class="sauna-page__water-text">
+        <SectionHeading
+          id="water-title"
+          index="03"
+          label="WATER & AIR"
+          title="水を出たあとの、10 分。"
+        />
+        <p class="body">
+          水風呂は井戸から汲み上げた水を掛け流しています。循環させないため、夏でも 15℃ を超えない想定です。冷たさに強くない方は、冷水シャワーだけでも構いません。
+        </p>
+        <p class="body">
+          外気浴のチェアは水風呂から 3 歩の位置に置きました。標高 700 メートル、夏でも夜は 20℃ 前後です。ブランケットは各棟に 2 枚あります。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section on-light" aria-labelledby="spec-title">
+    <div class="shell sauna-page__spec-grid">
+      <div class="sauna-page__head">
+        <SectionHeading id="spec-title" index="04" label="SPECIFICATION" title="設備の詳細。" />
+      </div>
+      <dl class="sauna-page__specs">
+        {
+          SAUNA_SPECS.map((spec) => (
+            <div>
+              <dt class="label">{spec.label}</dt>
+              <dd>{spec.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <FinalCta
+    eyebrow="BOOK A SAUNA NIGHT"
+    title="火を入れるところから。"
+    lead="薪サウナのある STONE / MIST は人気の棟です。空き状況をご確認ください。"
+  />
+</Base>
+
+<style>
+  .sauna-page__head {
+    margin-bottom: clamp(2rem, 4.5vw, 3.5rem);
+  }
+
+  .sauna-page__elements {
+    display: grid;
+    gap: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .sauna-page__element {
+    display: grid;
+    gap: 0.35rem;
+    padding-block: clamp(1.25rem, 3vw, 2rem);
+    border-block-end: 1px solid var(--line);
+    grid-template-columns: 3rem 1fr;
+    column-gap: var(--sp-m);
+  }
+
+  .sauna-page__element-no {
+    grid-row: span 4;
+    font-size: var(--fs-label);
+    letter-spacing: 0.2em;
+    color: var(--accent);
+  }
+
+  .sauna-page__element-label {
+    font-size: clamp(1.5rem, 4.5vw, 2.25rem);
+    font-weight: 300;
+    letter-spacing: 0.16em;
+    line-height: 1.1;
+  }
+
+  .sauna-page__element-ja {
+    color: var(--fg-faint);
+  }
+
+  .sauna-page__element-value {
+    font-size: var(--fs-lead);
+    color: var(--accent);
+    letter-spacing: 0.06em;
+  }
+
+  .sauna-page__element-body {
+    max-inline-size: 44em;
+    margin-top: 0.35rem;
+  }
+
+  .sauna-page__ritual-grid {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .sauna-page__ritual-head {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3rem);
+    align-content: start;
+  }
+
+  .sauna-page__ritual {
+    display: grid;
+    gap: 0;
+  }
+
+  .sauna-page__step {
+    position: relative;
+    padding: 0 0 clamp(1.5rem, 3vw, 2.25rem) clamp(1.75rem, 4vw, 2.5rem);
+    border-inline-start: 1px solid var(--line);
+  }
+
+  .sauna-page__step::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: -4px;
+    inset-block-start: 0.55em;
+    inline-size: 7px;
+    block-size: 7px;
+    border-radius: 50%;
+    background: var(--c-ember);
+  }
+
+  .sauna-page__step:last-child {
+    border-inline-start-color: transparent;
+    padding-block-end: 0;
+  }
+
+  .sauna-page__step-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .sauna-page__step-no {
+    font-size: var(--fs-label);
+    letter-spacing: 0.2em;
+    color: var(--accent);
+  }
+
+  .sauna-page__step-title {
+    font-size: var(--fs-lead);
+    letter-spacing: 0.08em;
+  }
+
+  .sauna-page__step-time {
+    font-size: var(--fs-label);
+    color: var(--fg-faint);
+    letter-spacing: 0.12em;
+    margin-inline-start: auto;
+  }
+
+  .sauna-page__step p {
+    max-inline-size: 42em;
+  }
+
+  .sauna-page__water {
+    display: grid;
+    gap: clamp(1.5rem, 3.5vw, 2.5rem);
+  }
+
+  .sauna-page__water-text {
+    display: grid;
+    gap: var(--sp-m);
+    align-content: center;
+  }
+
+  .sauna-page__spec-grid {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3rem);
+  }
+
+  .sauna-page__specs {
+    display: grid;
+    margin: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .sauna-page__specs div {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: var(--sp-s);
+    padding-block: 0.95rem;
+    border-block-end: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+
+  .sauna-page__specs dd {
+    margin: 0;
+  }
+
+  @media (min-width: 62em) {
+    .sauna-page__ritual-grid {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+      align-items: start;
+    }
+
+    .sauna-page__element {
+      grid-template-columns: 3.5rem 12rem 1fr;
+      align-items: baseline;
+    }
+
+    .sauna-page__element-no {
+      grid-row: span 3;
+    }
+
+    .sauna-page__element-label {
+      grid-column: 2;
+    }
+
+    .sauna-page__element-ja {
+      grid-column: 2;
+    }
+
+    .sauna-page__element-value {
+      grid-column: 3;
+      grid-row: 1;
+      justify-self: end;
+    }
+
+    .sauna-page__element-body {
+      grid-column: 3;
+      grid-row: 2 / span 2;
+    }
+
+    .sauna-page__water {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      align-items: center;
+    }
+
+    .sauna-page__water > :global(figure:first-child) {
+      grid-column: 1 / span 6;
+    }
+
+    .sauna-page__water > :global(.sauna-page__water-sub) {
+      grid-column: 7 / span 3;
+      align-self: end;
+    }
+
+    .sauna-page__water-text {
+      grid-column: 10 / span 3;
+    }
+
+    .sauna-page__spec-grid {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+      align-items: start;
+    }
+  }
+</style>

@@ -1,0 +1,208 @@
+---
+import { FOOTER_NAV, SITE } from '../data/site';
+import Logo from './Logo.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="shell footer__inner">
+    <div class="footer__lead">
+      <p class="footer__tagline font-mincho" data-reveal>{SITE.tagline}</p>
+      <a class="footer__brand" href="/" aria-label={`${SITE.brand} ホームへ`}>
+        <Logo />
+      </a>
+      <p class="footer__descriptor label">{SITE.descriptor}</p>
+    </div>
+
+    <nav class="footer__nav" aria-label="フッターナビゲーション">
+      <h2 class="visually-hidden">サイト内のページ</h2>
+      <ul class="footer__list">
+        {
+          FOOTER_NAV.map((item) => (
+            <li>
+              <a class="footer__link" href={item.href}>
+                <span class="font-en">{item.label}</span>
+                <span class="footer__link-ja">{item.labelJa}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <dl class="footer__info">
+      <div><dt>エリア</dt><dd>{SITE.area}</dd></div>
+      <div><dt>棟数</dt><dd>{SITE.rooms}</dd></div>
+      <div><dt>チェックイン</dt><dd class="num">{SITE.checkIn}</dd></div>
+      <div><dt>チェックアウト</dt><dd class="num">{SITE.checkOut}</dd></div>
+      <div><dt>お問い合わせ</dt><dd class="font-en footer__mail">{SITE.contactEmail}</dd></div>
+    </dl>
+  </div>
+
+  <div class="shell footer__bottom">
+    <p class="footer__notice small">
+      <span class="label label--accent">{SITE.conceptNotice.label}</span>
+      <span>{SITE.conceptNotice.long}</span>
+      <a class="footer__notice-link" href="/project/">この制作についてはこちら</a>
+    </p>
+    <p class="footer__copy small num">© {year} EMBER &amp; MOSS — Self-initiated concept project.</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--c-obsidian);
+    color: var(--c-ivory);
+    border-top: 1px solid var(--line);
+    padding-block: clamp(3.5rem, 6vw, 6rem) 0;
+  }
+
+  .footer__inner {
+    display: grid;
+    gap: var(--sp-xl);
+    padding-bottom: clamp(3rem, 5vw, 5rem);
+  }
+
+  .footer__lead {
+    display: grid;
+    gap: var(--sp-m);
+  }
+
+  .footer__tagline {
+    font-size: clamp(1.75rem, 5.5vw, 3rem);
+    line-height: 1.4;
+    letter-spacing: 0.08em;
+  }
+
+  .footer__brand {
+    --logo-size: 0.9375rem;
+    justify-self: start;
+  }
+
+  .footer__descriptor {
+    color: var(--fg-faint);
+  }
+
+  .footer__list {
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .footer__link {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-s);
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--fs-small);
+    letter-spacing: 0.16em;
+    min-block-size: var(--tap-min);
+    transition: color var(--dur-fast) var(--ease-out), padding-inline-start var(--dur-base) var(--ease-out);
+  }
+
+  .footer__link:hover,
+  .footer__link:focus-visible {
+    color: var(--c-ember-bright);
+    padding-inline-start: 0.5rem;
+  }
+
+  .footer__link-ja {
+    font-size: 0.6875rem;
+    color: var(--fg-faint);
+  }
+
+  .footer__info {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    font-size: var(--fs-small);
+  }
+
+  .footer__info div {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: var(--sp-s);
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .footer__info dt {
+    color: var(--fg-faint);
+    font-size: var(--fs-label);
+    letter-spacing: 0.1em;
+  }
+
+  .footer__info dd {
+    margin: 0;
+    color: var(--fg-muted);
+  }
+
+  .footer__mail {
+    letter-spacing: 0.04em;
+    word-break: break-all;
+  }
+
+  .footer__bottom {
+    display: grid;
+    gap: var(--sp-m);
+    padding-block: var(--sp-m) var(--sp-l);
+    border-top: 1px solid var(--line);
+    color: var(--fg-faint);
+  }
+
+  .footer__notice {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 60ch;
+    font-size: var(--fs-small);
+    line-height: 1.85;
+  }
+
+  .footer__notice-link {
+    justify-self: start;
+    border-bottom: 1px solid var(--line-strong);
+    padding-bottom: 2px;
+    color: var(--fg-muted);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  .footer__notice-link:hover {
+    color: var(--c-ember-bright);
+  }
+
+  .footer__copy {
+    color: var(--fg-faint);
+    font-size: var(--fs-label);
+    letter-spacing: 0.08em;
+  }
+
+  @media (min-width: 48em) {
+    .footer__inner {
+      grid-template-columns: 1.2fr 1fr;
+      column-gap: var(--sp-2xl);
+    }
+
+    .footer__lead {
+      grid-row: span 2;
+      align-content: start;
+    }
+
+    .footer__bottom {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+    }
+  }
+
+  @media (min-width: 75em) {
+    .footer__inner {
+      grid-template-columns: 1.4fr 1fr 1fr;
+    }
+
+    .footer__lead {
+      grid-row: auto;
+    }
+  }
+</style>

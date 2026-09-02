@@ -1,0 +1,40 @@
+/* =========================================================
+   Web fonts
+   日本語は scripts/build-fonts.mjs でサイト内の使用文字のみに
+   サブセット化したものを自己ホストしている（フルセットの約 1/10）。
+   ========================================================= */
+
+/* ラテン : Jost Variable（見出し・ラベル・数値） */
+@font-face {
+  font-family: 'Jost';
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url('/fonts/jost-latin-variable.woff2') format('woff2-variations');
+}
+
+/* 和文ゴシック : 本文 */
+@font-face {
+  font-family: 'Zen Kaku Gothic New';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/zen-kaku-gothic-new-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Zen Kaku Gothic New';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/zen-kaku-gothic-new-500.woff2') format('woff2');
+}
+
+/* 和文明朝 : 大見出しのみ */
+@font-face {
+  font-family: 'Shippori Mincho';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/shippori-mincho-400.woff2') format('woff2');
+}

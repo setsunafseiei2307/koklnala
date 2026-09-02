@@ -1,0 +1,87 @@
+---
+import type { Villa } from '../data/villas';
+
+interface Props {
+  villa: Villa;
+}
+
+const { villa } = Astro.props;
+
+/** 12 × 8 のグリッドを 1 マス 40px で描く簡易平面図 */
+const UNIT = 40;
+const COLS = 12;
+const ROWS = 8;
+const TONE_FILL: Record<string, string> = {
+  deck: 'rgba(184, 118, 67, 0.08)',
+  water: 'rgba(120, 150, 152, 0.14)',
+  heat: 'rgba(184, 118, 67, 0.2)',
+};
+---
+
+<figure class="plan">
+  <svg
+    class="plan__svg"
+    viewBox={`0 0 ${COLS * UNIT} ${ROWS * UNIT}`}
+    role="img"
+    aria-label={`${villa.name} の間取りイメージ。${villa.plan.rooms.map((room) => room.label).join('、')}で構成されています。`}
+  >
+    <defs>
+      <pattern id={`grid-${villa.id}`} width={UNIT} height={UNIT} patternUnits="userSpaceOnUse">
+        <path d={`M ${UNIT} 0 L 0 0 0 ${UNIT}`} fill="none" stroke="currentColor" stroke-opacity="0.07" />
+      </pattern>
+    </defs>
+    <rect width={COLS * UNIT} height={ROWS * UNIT} fill={`url(#grid-${villa.id})`} />
+
+    {
+      villa.plan.rooms.map((room) => (
+        <g>
+          <rect
+            x={room.x * UNIT}
+            y={room.y * UNIT}
+            width={room.w * UNIT}
+            height={room.h * UNIT}
+            fill={room.tone ? TONE_FILL[room.tone] : 'rgba(216, 208, 195, 0.05)'}
+            stroke="currentColor"
+            stroke-opacity="0.42"
+          />
+          <text
+            x={room.x * UNIT + 12}
+            y={room.y * UNIT + 26}
+            class="plan__label"
+            fill="currentColor"
+          >
+            {room.label}
+          </text>
+        </g>
+      ))
+    }
+  </svg>
+  <figcaption class="plan__caption small">{villa.plan.note}（イメージ図・実寸ではありません）</figcaption>
+</figure>
+
+<style>
+  .plan {
+    margin: 0;
+    display: grid;
+    gap: var(--sp-s);
+    color: var(--fg);
+  }
+
+  .plan__svg {
+    inline-size: 100%;
+    block-size: auto;
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+  }
+
+  .plan__label {
+    font-family: var(--font-en);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    opacity: 0.72;
+  }
+
+  .plan__caption {
+    color: var(--fg-faint);
+  }
+</style>

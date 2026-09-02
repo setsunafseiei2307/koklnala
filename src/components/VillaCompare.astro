@@ -1,0 +1,166 @@
+---
+import { VILLAS, villaFromRate } from '../data/villas';
+import { yen } from '../lib/pricing';
+
+const rows: { label: string; value: (villa: (typeof VILLAS)[number]) => string }[] = [
+  { label: '定員', value: (villa) => `1 – ${villa.capacity.max} 名` },
+  { label: '広さ', value: (villa) => `${villa.area} / ${villa.terrace}` },
+  { label: 'ベッド', value: (villa) => villa.bed },
+  { label: '風呂', value: (villa) => villa.bath },
+  { label: 'サウナ', value: (villa) => villa.sauna },
+  { label: '眺め', value: (villa) => villa.view },
+  { label: '向いている滞在', value: (villa) => villa.bestFor },
+];
+---
+
+<div class="cmp">
+  <p class="cmp__hint small">横にスクロールすると 3 棟を比較できます</p>
+
+  <div class="cmp__scroll" tabindex="0" role="region" aria-label="客室比較表（横スクロールできます）">
+    <table class="cmp__table">
+      <caption class="visually-hidden">3 棟の設備と料金の比較</caption>
+      <thead>
+        <tr>
+          <th scope="col"><span class="visually-hidden">項目</span></th>
+          {
+            VILLAS.map((villa) => (
+              <th scope="col">
+                <span class="cmp__name font-en">{villa.name}</span>
+                <span class="cmp__tagline">{villa.tagline}</span>
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row) => (
+            <tr>
+              <th scope="row" class="label">{row.label}</th>
+              {VILLAS.map((villa) => <td>{row.value(villa)}</td>)}
+            </tr>
+          ))
+        }
+        <tr>
+          <th scope="row" class="label">料金</th>
+          {
+            VILLAS.map((villa) => (
+              <td>
+                <span class="cmp__price num">{yen(villaFromRate(villa.id))}</span>
+                <span class="cmp__unit small">/ 1 泊 2 名〜</span>
+              </td>
+            ))
+          }
+        </tr>
+        <tr>
+          <th scope="row"><span class="visually-hidden">リンク</span></th>
+          {
+            VILLAS.map((villa) => (
+              <td>
+                <a class="cmp__link" href={`/booking/?villa=${villa.id}`}>
+                  この棟で予約する
+                  <span class="link__arrow" aria-hidden="true">→</span>
+                </a>
+              </td>
+            ))
+          }
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  .cmp__hint {
+    color: var(--fg-faint);
+    margin-bottom: var(--sp-s);
+  }
+
+  .cmp__scroll {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+
+  .cmp__table {
+    inline-size: 100%;
+    min-inline-size: 46rem;
+    border-collapse: collapse;
+    text-align: start;
+  }
+
+  .cmp__table th,
+  .cmp__table td {
+    padding: clamp(0.85rem, 1.6vw, 1.15rem) clamp(0.75rem, 1.6vw, 1.25rem);
+    border-block-end: 1px solid var(--line);
+    vertical-align: top;
+    text-align: start;
+    font-size: var(--fs-small);
+    line-height: 1.8;
+  }
+
+  .cmp__table thead th {
+    border-block-end: 1px solid var(--line-strong);
+    padding-block-end: var(--sp-m);
+  }
+
+  .cmp__table tbody th {
+    inline-size: 8rem;
+    color: var(--fg-faint);
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  .cmp__name {
+    display: block;
+    font-size: clamp(1rem, 2.2vw, 1.25rem);
+    letter-spacing: 0.14em;
+    margin-bottom: 0.35rem;
+  }
+
+  .cmp__tagline {
+    display: block;
+    font-size: var(--fs-label);
+    color: var(--fg-muted);
+    letter-spacing: 0.06em;
+  }
+
+  .cmp__price {
+    display: block;
+    font-size: 1.125rem;
+    color: var(--fg);
+  }
+
+  .cmp__unit {
+    color: var(--fg-faint);
+  }
+
+  .cmp__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    min-block-size: var(--tap-min);
+    font-size: var(--fs-small);
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    border-block-end: 1px solid currentColor;
+    padding-block: 0.35em;
+  }
+
+  .cmp__link:hover .link__arrow {
+    translate: 0.35em 0;
+  }
+
+  /* 最初の列は横スクロール中も固定して読みやすくする */
+  @media (max-width: 61.99em) {
+    .cmp__table tbody th,
+    .cmp__table thead th:first-child {
+      position: sticky;
+      inset-inline-start: 0;
+      background: var(--bg);
+      z-index: 1;
+      inline-size: 6.5rem;
+    }
+  }
+</style>

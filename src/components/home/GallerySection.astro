@@ -1,0 +1,30 @@
+---
+import Gallery from '../Gallery.astro';
+import SectionHeading from '../SectionHeading.astro';
+---
+
+<section class="gal section section--tight" id="gallery" aria-labelledby="gal-title">
+  <div class="shell">
+    <div class="gal__heading">
+      <SectionHeading
+      id="gal-title"
+      index="07"
+      label="GALLERY"
+      title="時間ごとに、違う場所に見える。"
+      />
+    </div>
+  </div>
+  <Gallery />
+</section>
+
+<style>
+  .gal {
+    background: var(--c-obsidian);
+    /* 横スクロール領域が画面端まで届くよう shell を外している */
+    padding-inline: 0;
+  }
+
+  .gal__heading {
+    margin-bottom: clamp(1.75rem, 4vw, 3rem);
+  }
+</style>

@@ -1,0 +1,132 @@
+/* =========================================================
+   EMBER & MOSS — Design Tokens
+   色・タイポ・余白・モーションを一元管理する。
+   コンポーネント側で生の値を書かないこと。
+   ========================================================= */
+
+:root {
+  /* ---- Color ------------------------------------------ */
+  --c-obsidian: #0c0e0d;
+  --c-forest-deep: #16201a;
+  --c-forest: #1d2b23;
+  --c-forest-soft: #24332a;
+  --c-stone: #d8d0c3;
+  --c-ivory: #f1ede5;
+  --c-ivory-deep: #e6e0d4;
+  --c-ember: #b87643;
+  --c-ember-bright: #d18d55;
+  --c-moss: #6f7d6a;
+
+  /* 役割ベース（ダーク面が既定） */
+  --bg: var(--c-obsidian);
+  --bg-raised: var(--c-forest-deep);
+  --fg: #ece7dd;
+  --fg-muted: #a3a99f;
+  --fg-faint: #767c73;
+  --accent: var(--c-ember);
+  --accent-fg: #f6efe6;
+  --line: rgba(216, 208, 195, 0.16);
+  --line-strong: rgba(216, 208, 195, 0.32);
+  --overlay: rgba(8, 10, 9, 0.72);
+
+  /* ---- Typography ------------------------------------- */
+  --font-en: 'Jost', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-ja: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP',
+    'Yu Gothic', Meiryo, sans-serif;
+  --font-mincho: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+
+  /* 流体タイプスケール : 375px → 1600px */
+  --fs-display: clamp(2.75rem, 1.4rem + 6.2vw, 7.5rem);
+  --fs-h1: clamp(2rem, 1.25rem + 3.4vw, 4.25rem);
+  --fs-h2: clamp(1.625rem, 1.1rem + 2.3vw, 3rem);
+  --fs-h3: clamp(1.25rem, 1.05rem + 0.85vw, 1.75rem);
+  --fs-lead: clamp(1.0625rem, 0.99rem + 0.35vw, 1.3125rem);
+  --fs-body: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
+  --fs-small: clamp(0.8125rem, 0.79rem + 0.12vw, 0.875rem);
+  --fs-label: clamp(0.6875rem, 0.67rem + 0.08vw, 0.75rem);
+
+  --lh-tight: 1.12;
+  --lh-heading: 1.3;
+  --lh-body: 1.95;
+  --lh-lead: 1.85;
+
+  --tracking-label: 0.22em;
+  --tracking-en: 0.06em;
+  --tracking-ja: 0.04em;
+
+  /* 日本語本文の最大行幅（可読性優先） */
+  --measure: 34em;
+  --measure-narrow: 26em;
+
+  /* ---- Space ------------------------------------------ */
+  --sp-3xs: 0.25rem;
+  --sp-2xs: 0.5rem;
+  --sp-xs: 0.75rem;
+  --sp-s: 1rem;
+  --sp-m: 1.5rem;
+  --sp-l: 2.5rem;
+  --sp-xl: 4rem;
+  --sp-2xl: 6rem;
+  --sp-3xl: clamp(5rem, 3rem + 9vw, 11rem);
+  --section-y: clamp(4.5rem, 2.8rem + 7.5vw, 10rem);
+
+  --page-gutter: clamp(1.25rem, 0.6rem + 3vw, 4.5rem);
+  --page-max: 1560px;
+  --content-max: 1180px;
+
+  --header-h: 4.5rem;
+  --tap-min: 44px;
+
+  /* ---- Motion ----------------------------------------- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0.05, 0.36, 1);
+  --dur-fast: 220ms;
+  --dur-base: 420ms;
+  --dur-slow: 760ms;
+  --dur-reveal: 1000ms;
+
+  --z-header: 60;
+  --z-menu: 70;
+  --z-bar: 50;
+  --z-lightbox: 90;
+}
+
+@media (min-width: 48em) {
+  :root {
+    --header-h: 5.5rem;
+  }
+}
+
+/* 明るい面（ivory セクション）で使う反転トークン */
+.on-light {
+  --bg: var(--c-ivory);
+  --bg-raised: #ffffff;
+  --fg: #1a1f1b;
+  --fg-muted: #555c53;
+  --fg-faint: #7c8279;
+  --accent: #9a5c2e;
+  --line: rgba(26, 31, 27, 0.14);
+  --line-strong: rgba(26, 31, 27, 0.28);
+  color: var(--fg);
+  background-color: var(--bg);
+}
+
+.on-stone {
+  --bg: var(--c-ivory-deep);
+  --bg-raised: var(--c-ivory);
+  --fg: #1a1f1b;
+  --fg-muted: #555c53;
+  --fg-faint: #7c8279;
+  --accent: #9a5c2e;
+  --line: rgba(26, 31, 27, 0.14);
+  --line-strong: rgba(26, 31, 27, 0.28);
+  color: var(--fg);
+  background-color: var(--bg);
+}
+
+.on-forest {
+  --bg: var(--c-forest-deep);
+  --bg-raised: var(--c-forest);
+  color: var(--fg);
+  background-color: var(--bg);
+}

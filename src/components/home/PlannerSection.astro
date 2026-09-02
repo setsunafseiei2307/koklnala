@@ -1,0 +1,31 @@
+---
+import PriceEstimator from '../PriceEstimator.astro';
+import SectionHeading from '../SectionHeading.astro';
+---
+
+<section class="planner section" id="planner" aria-labelledby="planner-title">
+  <div class="shell">
+    <div class="planner__heading">
+      <SectionHeading
+      id="planner-title"
+      index="05"
+      label="STAY PLANNER"
+      title="いくらになるか、先に見ておく。"
+      lead="人数と泊数を入れるだけで概算が出ます。入力した条件はそのまま予約ページへ引き継がれます。"
+      />
+    </div>
+    <PriceEstimator />
+  </div>
+</section>
+
+<style>
+  .planner {
+    background:
+      radial-gradient(90% 60% at 82% 8%, rgba(184, 118, 67, 0.1), transparent 62%),
+      var(--c-obsidian);
+  }
+
+  .planner__heading {
+    margin-bottom: clamp(2rem, 4.5vw, 3.5rem);
+  }
+</style>

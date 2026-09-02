@@ -1,0 +1,383 @@
+---
+import { MEAL_PLANS, STAY_LIMITS } from '../data/pricing';
+import { VILLAS, villaFromRate } from '../data/villas';
+import { DEFAULT_STAY, estimate, yen } from '../lib/pricing';
+
+/** JS 無効でも初期値の見積もりが表示されるようサーバー側で計算しておく */
+const initial = estimate(DEFAULT_STAY);
+const maxGuests = Math.max(...VILLAS.map((villa) => villa.capacity.max));
+---
+
+<form class="est" data-estimator novalidate>
+  <div class="est__controls">
+    <fieldset class="est__field">
+      <legend class="est__legend label">01 — VILLA / ヴィラ</legend>
+      <div class="est__options est__options--villa">
+        {
+          VILLAS.map((villa) => (
+            <label class="est__option">
+              <input
+                type="radio"
+                name="villa"
+                value={villa.id}
+                checked={villa.id === DEFAULT_STAY.villaId}
+              />
+              <span class="est__option-body">
+                <span class="est__option-title font-en">{villa.name}</span>
+                <span class="est__option-note num">{yen(villaFromRate(villa.id))}〜</span>
+                <span class="est__option-meta">定員 {villa.capacity.max} 名 / {villa.area}</span>
+              </span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <div class="est__pair">
+      <fieldset class="est__field">
+        <legend class="est__legend label">02 — GUESTS / 人数</legend>
+        <div class="est__stepper">
+          <button type="button" class="est__step" data-step="guests" data-delta="-1" aria-label="人数を減らす">
+            <span aria-hidden="true">−</span>
+          </button>
+          <input
+            class="est__number num"
+            type="number"
+            name="guests"
+            inputmode="numeric"
+            value={DEFAULT_STAY.guests}
+            min="1"
+            max={maxGuests}
+            step="1"
+            aria-label="宿泊人数（名）"
+            data-input="guests"
+          />
+          <span class="est__unit">名</span>
+          <button type="button" class="est__step" data-step="guests" data-delta="1" aria-label="人数を増やす">
+            <span aria-hidden="true">＋</span>
+          </button>
+        </div>
+        <p class="est__hint small" data-guest-hint></p>
+      </fieldset>
+
+      <fieldset class="est__field">
+        <legend class="est__legend label">03 — NIGHTS / 泊数</legend>
+        <div class="est__stepper">
+          <button type="button" class="est__step" data-step="nights" data-delta="-1" aria-label="泊数を減らす">
+            <span aria-hidden="true">−</span>
+          </button>
+          <input
+            class="est__number num"
+            type="number"
+            name="nights"
+            inputmode="numeric"
+            value={DEFAULT_STAY.nights}
+            min={STAY_LIMITS.minNights}
+            max={STAY_LIMITS.maxNights}
+            step="1"
+            aria-label="宿泊数（泊）"
+            data-input="nights"
+          />
+          <span class="est__unit">泊</span>
+          <button type="button" class="est__step" data-step="nights" data-delta="1" aria-label="泊数を増やす">
+            <span aria-hidden="true">＋</span>
+          </button>
+        </div>
+        <p class="est__hint small">2 泊から連泊割引が入ります</p>
+      </fieldset>
+    </div>
+
+    <fieldset class="est__field">
+      <legend class="est__legend label">04 — MEALS / 食事</legend>
+      <div class="est__options">
+        {
+          MEAL_PLANS.map((plan) => (
+            <label class="est__option est__option--row">
+              <input
+                type="radio"
+                name="meal"
+                value={plan.id}
+                checked={plan.id === DEFAULT_STAY.mealPlanId}
+              />
+              <span class="est__option-body">
+                <span class="est__option-title">{plan.label}</span>
+                <span class="est__option-meta num">
+                  {plan.perGuestPerNight === 0 ? '±0' : `+${yen(plan.perGuestPerNight)} / 名・泊`}
+                </span>
+              </span>
+            </label>
+          ))
+        }
+      </div>
+    </fieldset>
+  </div>
+
+  <aside class="est__summary">
+    <h3 class="est__summary-title label">概算料金</h3>
+
+    <dl class="est__lines" data-summary aria-live="polite">
+      <div class="est__line">
+        <dt>宿泊</dt>
+        <dd class="num" data-line="accommodation">{yen(initial.accommodationTotal)}</dd>
+      </div>
+      <div class="est__line" data-line-row="discount" hidden={initial.accommodationDiscount === 0}>
+        <dt data-line="discount-label">連泊割引</dt>
+        <dd class="num est__line--discount" data-line="discount">{yen(initial.accommodationDiscount)}</dd>
+      </div>
+      <div class="est__line">
+        <dt>食事</dt>
+        <dd class="num" data-line="meals">{yen(initial.mealTotal)}</dd>
+      </div>
+      <div class="est__line">
+        <dt>入湯税</dt>
+        <dd class="num" data-line="tax">{yen(initial.bathingTax)}</dd>
+      </div>
+    </dl>
+
+    <p class="est__total">
+      <span class="label">合計（税・サービス料込）</span>
+      <span class="est__total-amount num" data-total>{yen(initial.total)}</span>
+      <span class="est__total-note small" data-per-night>
+        1 名 1 泊あたり {yen(initial.perGuestPerNight)}
+      </span>
+    </p>
+
+    <a class="btn btn--primary btn--block" href="/booking/" data-estimator-cta>
+      <span class="btn__label">この条件で予約に進む</span>
+    </a>
+    <p class="est__disclaimer small">
+      表示は概算です。実際の予約は行われません（CONCEPT PROJECT）。
+    </p>
+  </aside>
+</form>
+
+<script>
+  import { initEstimator } from '../scripts/estimator';
+  initEstimator();
+</script>
+
+<style>
+  .est {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+
+  .est__controls {
+    display: grid;
+    gap: clamp(1.75rem, 3.5vw, 2.75rem);
+  }
+
+  .est__field {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--sp-s);
+  }
+
+  .est__legend {
+    padding: 0;
+    color: var(--fg-faint);
+  }
+
+  .est__options {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .est__options--villa {
+    grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  }
+
+  .est__option {
+    position: relative;
+    display: block;
+    border: 1px solid var(--line);
+    padding: 0.9rem 1rem;
+    min-block-size: var(--tap-min);
+    cursor: pointer;
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .est__option input {
+    position: absolute;
+    opacity: 0;
+    inline-size: 1px;
+    block-size: 1px;
+  }
+
+  .est__option-body {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .est__option--row .est__option-body {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-s);
+  }
+
+  .est__option-title {
+    font-size: var(--fs-small);
+    letter-spacing: 0.12em;
+  }
+
+  .est__option-note {
+    font-size: var(--fs-small);
+    color: var(--c-ember-bright);
+    letter-spacing: 0.02em;
+  }
+
+  .est__option-meta {
+    font-size: var(--fs-label);
+    color: var(--fg-faint);
+    letter-spacing: 0.06em;
+  }
+
+  .est__option:hover {
+    border-color: var(--line-strong);
+  }
+
+  .est__option:has(input:checked) {
+    border-color: var(--c-ember);
+    background: rgba(184, 118, 67, 0.09);
+  }
+
+  .est__option:has(input:focus-visible) {
+    outline: 2px solid var(--c-ember-bright);
+    outline-offset: 2px;
+  }
+
+  .est__pair {
+    display: grid;
+    gap: clamp(1.75rem, 3.5vw, 2.75rem);
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  }
+
+  .est__stepper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--line);
+    padding: 0.35rem;
+  }
+
+  .est__step {
+    inline-size: var(--tap-min);
+    block-size: var(--tap-min);
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
+    color: var(--fg);
+    border: 1px solid transparent;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+
+  .est__step:hover:not([disabled]) {
+    background: rgba(216, 208, 195, 0.1);
+  }
+
+  .est__step[disabled] {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .est__number {
+    flex: 1;
+    min-inline-size: 0;
+    text-align: center;
+    font-size: 1.25rem;
+    background: none;
+    border: none;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  .est__number::-webkit-outer-spin-button,
+  .est__number::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .est__unit {
+    font-size: var(--fs-small);
+    color: var(--fg-muted);
+  }
+
+  .est__hint {
+    color: var(--fg-faint);
+    min-block-size: 1.5em;
+  }
+
+  .est__summary {
+    display: grid;
+    gap: var(--sp-m);
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border: 1px solid var(--line);
+    background: var(--bg-raised);
+  }
+
+  .est__summary-title {
+    color: var(--fg-faint);
+  }
+
+  .est__lines {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .est__line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-s);
+    padding-block: 0.7rem;
+    border-block-end: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+
+  .est__line dd {
+    margin: 0;
+  }
+
+  .est__line--discount {
+    color: var(--c-ember-bright);
+  }
+
+  .est__total {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .est__total-amount {
+    font-size: clamp(2rem, 6vw, 2.75rem);
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+  }
+
+  .est__total-note {
+    color: var(--fg-faint);
+  }
+
+  .est__disclaimer {
+    color: var(--fg-faint);
+  }
+
+  @media (min-width: 62em) {
+    .est {
+      grid-template-columns: minmax(0, 1.25fr) minmax(20rem, 0.85fr);
+      column-gap: clamp(2.5rem, 5vw, 4.5rem);
+    }
+
+    .est__summary {
+      position: sticky;
+      top: calc(var(--header-h) + 2rem);
+    }
+  }
+</style>

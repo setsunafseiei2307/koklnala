@@ -1,0 +1,168 @@
+---
+import Figure from './Figure.astro';
+import { villaFromRate, type Villa } from '../data/villas';
+import { yen } from '../lib/pricing';
+
+interface Props {
+  villa: Villa;
+  index: number;
+  /** 偶数行で画像とテキストを入れ替える */
+  reversed?: boolean;
+}
+
+const { villa, index, reversed = false } = Astro.props;
+const rate = yen(villaFromRate(villa.id));
+---
+
+<article class:list={['villa', reversed && 'villa--reversed']} aria-labelledby={`villa-${villa.id}`}>
+  <div class="villa__media">
+    <Figure
+      id={villa.exterior.id}
+      alt={villa.exterior.alt}
+      sizes="(max-width: 61.99em) 100vw, 52vw"
+      ratio="4 / 3"
+    />
+    <span class="villa__index num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+  </div>
+
+  <div class="villa__body">
+    <header class="villa__head" data-reveal>
+      <h3 class="villa__name font-en" id={`villa-${villa.id}`}>{villa.name}</h3>
+      <p class="villa__tagline font-mincho">{villa.tagline}</p>
+    </header>
+
+    <dl class="villa__specs" data-reveal style="--reveal-delay:80ms">
+      {
+        villa.specs.map((spec) => (
+          <div class="villa__spec">
+            <dt class="label">{spec.label}</dt>
+            <dd>{spec.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <div class="villa__foot" data-reveal style="--reveal-delay:140ms">
+      <p class="villa__price">
+        <span class="label">1 泊 2 名</span>
+        <span class="villa__amount num">{rate}<span class="villa__from">〜</span></span>
+      </p>
+      <a class="link" href={`/stay/${villa.slug}/`}>
+        <span>詳細を見る</span>
+        <span class="link__arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</article>
+
+<style>
+  .villa {
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+    border-block-start: 1px solid var(--line);
+  }
+
+  .villa__media {
+    position: relative;
+  }
+
+  .villa__index {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    padding: 0.55rem 0.85rem;
+    background: var(--bg);
+    color: var(--accent);
+    font-size: var(--fs-label);
+    letter-spacing: 0.2em;
+  }
+
+  .villa__body {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.25rem);
+    align-content: start;
+  }
+
+  .villa__name {
+    font-size: clamp(1.75rem, 5.5vw, 3rem);
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    line-height: 1.1;
+  }
+
+  .villa__tagline {
+    margin-top: 0.9rem;
+    font-size: var(--fs-lead);
+    letter-spacing: 0.08em;
+    color: var(--fg-muted);
+  }
+
+  .villa__specs {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .villa__spec {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr;
+    gap: var(--sp-s);
+    align-items: baseline;
+    padding-block: 0.75rem;
+    border-block-end: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+
+  .villa__spec dd {
+    margin: 0;
+  }
+
+  .villa__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--sp-m);
+  }
+
+  .villa__price {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .villa__amount {
+    font-size: clamp(1.375rem, 4vw, 1.75rem);
+    line-height: 1;
+  }
+
+  .villa__from {
+    font-size: 0.75rem;
+    color: var(--fg-muted);
+    margin-inline-start: 0.2em;
+  }
+
+  @media (min-width: 62em) {
+    .villa {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      column-gap: clamp(2.5rem, 5vw, 5rem);
+      align-items: center;
+      padding-block: clamp(4rem, 7vw, 6.5rem);
+    }
+
+    .villa--reversed .villa__media {
+      order: 2;
+    }
+
+    .villa__specs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--sp-l);
+    }
+
+    /* 2 カラム時に上罫線が二重にならないよう調整 */
+    .villa__spec:nth-child(2n) {
+      border-inline-start: none;
+    }
+  }
+</style>

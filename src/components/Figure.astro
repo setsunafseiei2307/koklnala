@@ -1,0 +1,96 @@
+---
+import { Picture } from 'astro:assets';
+import { getImage, type ImageId } from '../data/images';
+import { imageSource } from '../lib/images';
+
+interface Props {
+  id: ImageId;
+  alt?: string;
+  /** 表示比率。省略時はアセット定義の比率 */
+  ratio?: string;
+  sizes?: string;
+  /** LCP 候補は true。lazy を外し fetchpriority を上げる */
+  priority?: boolean;
+  objectPosition?: string;
+  class?: string;
+  /** マスクでせり上がる出現アニメーション */
+  reveal?: boolean;
+  caption?: string;
+  widths?: number[];
+}
+
+const {
+  id,
+  alt,
+  ratio,
+  sizes = '(max-width: 47.99em) 100vw, 50vw',
+  priority = false,
+  objectPosition = 'center',
+  class: className = '',
+  reveal = true,
+  caption,
+  widths,
+} = Astro.props;
+
+const asset = getImage(id);
+const source = imageSource(id);
+const aspect = ratio ?? `${asset.ratio[0]} / ${asset.ratio[1]}`;
+const resolvedWidths = widths ?? [480, 768, 1024, 1440, 1920].filter((w) => w <= source.width);
+---
+
+<figure
+  class:list={['figure', className]}
+  style={`--figure-ratio:${aspect};--figure-position:${objectPosition};`}
+>
+  <div class="figure__frame" data-reveal-mask={reveal ? '' : undefined}>
+    <Picture
+      src={source}
+      alt={alt ?? asset.alt}
+      formats={['avif', 'webp']}
+      fallbackFormat="webp"
+      widths={resolvedWidths}
+      sizes={sizes}
+      loading={priority ? 'eager' : 'lazy'}
+      decoding={priority ? 'sync' : 'async'}
+      fetchpriority={priority ? 'high' : 'auto'}
+      class="figure__img"
+    />
+  </div>
+  {caption && <figcaption class="figure__caption small">{caption}</figcaption>}
+</figure>
+
+<style>
+  .figure {
+    margin: 0;
+  }
+
+  /* Picture が生成する <picture> を透過させ、img を枠いっぱいに敷く */
+  .figure__frame picture {
+    display: contents;
+  }
+
+  .figure__frame {
+    position: relative;
+    aspect-ratio: var(--figure-ratio);
+    overflow: hidden;
+    background-color: var(--c-forest-deep);
+  }
+
+  .figure__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--figure-position);
+    /* 露出のわずかな持ち上げ。全画像のトーンを揃える */
+    filter: saturate(0.96);
+  }
+
+  .figure__caption {
+    margin-top: var(--sp-xs);
+    color: var(--fg-faint);
+    font-family: var(--font-en);
+    letter-spacing: 0.1em;
+    font-size: var(--fs-label);
+    text-transform: uppercase;
+  }
+</style>

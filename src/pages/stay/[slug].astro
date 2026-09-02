@@ -1,0 +1,279 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Figure from '../../components/Figure.astro';
+import FloorPlan from '../../components/FloorPlan.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import FinalCta from '../../components/FinalCta.astro';
+import { VILLAS, villaFromRate, type Villa } from '../../data/villas';
+import { EXTRA_GUEST_RATE, MEAL_RATE } from '../../data/pricing';
+import { yen } from '../../lib/pricing';
+
+export function getStaticPaths() {
+  return VILLAS.map((villa, index) => ({
+    params: { slug: villa.slug },
+    props: {
+      villa,
+      next: VILLAS[(index + 1) % VILLAS.length]!,
+      prev: VILLAS[(index - 1 + VILLAS.length) % VILLAS.length]!,
+    },
+  }));
+}
+
+interface Props {
+  villa: Villa;
+  next: Villa;
+  prev: Villa;
+}
+
+const { villa, next, prev } = Astro.props;
+---
+
+<Base
+  title={`${villa.name} / ${villa.nameJa}`}
+  description={`${villa.name}（定員 ${villa.capacity.max} 名・${villa.area}）。${villa.tagline} ${villa.bath}と専用サウナを備えた一棟貸しヴィラ。1 泊 2 名 ${yen(villaFromRate(villa.id))}〜。`}
+>
+  <PageHero
+    label={villa.name}
+    title={villa.tagline}
+    image={villa.exterior.id}
+    crumb={[{ label: 'STAY', href: '/stay/' }]}
+  />
+
+  <section class="section on-light" aria-labelledby="about-title">
+    <div class="shell villa-page__intro">
+      <div class="villa-page__text">
+        <SectionHeading
+          id="about-title"
+          index="01"
+          label="ABOUT"
+          title={villa.nameJa}
+          face="gothic"
+        />
+        {villa.body.map((paragraph) => <p class="body">{paragraph}</p>)}
+        <p class="villa-page__best small">{villa.bestFor}</p>
+      </div>
+
+      <dl class="villa-page__specs">
+        {
+          villa.specs.map((spec) => (
+            <div>
+              <dt class="label">{spec.label}</dt>
+              <dd>{spec.value}</dd>
+            </div>
+          ))
+        }
+        <div>
+          <dt class="label">眺め</dt>
+          <dd>{villa.view}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section on-stone" aria-labelledby="plan-title">
+    <div class="shell">
+      <div class="villa-page__head">
+        <SectionHeading id="plan-title" index="02" label="INTERIOR & PLAN" title="部屋の中と、配置。" />
+      </div>
+      <div class="villa-page__plan">
+        <Figure
+          id={villa.interior.id}
+          alt={villa.interior.alt}
+          sizes="(max-width: 61.99em) 100vw, 55vw"
+          ratio="4 / 3"
+        />
+        <FloorPlan villa={villa} />
+      </div>
+
+      <div class="villa-page__amenities">
+        <h3 class="label">備品・設備</h3>
+        <ul>
+          {villa.amenities.map((item) => <li>{item}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section on-forest" aria-labelledby="rate-title">
+    <div class="shell villa-page__rate">
+      <div>
+        <SectionHeading id="rate-title" index="03" label="RATE" title="料金の目安。" />
+        <p class="body">
+          表示は 1 棟 1 泊・2 名までの料金です。3 名以降は 1 名 1 泊につき {yen(EXTRA_GUEST_RATE)}、食事は夕食
+          {yen(MEAL_RATE.dinner)} / 朝食 {yen(MEAL_RATE.breakfast)}（いずれも 1 名 1 泊）を加算します。
+        </p>
+      </div>
+
+      <div class="villa-page__price">
+        <p class="villa-page__amount num">
+          {yen(villaFromRate(villa.id))}<span class="villa-page__unit">〜 / 泊</span>
+        </p>
+        <p class="small">2 泊以上で宿泊料金が 8%、3 泊以上で 12% 割引になります。</p>
+        <a class="btn btn--primary btn--block" href={`/booking/?villa=${villa.id}`}>
+          <span class="btn__label">この棟で空室を見る</span>
+        </a>
+        <a class="link" href="/booking/">
+          <span>3 棟の空室をまとめて見る</span>
+          <span class="link__arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <nav class="villa-page__nav" aria-label="他の客室">
+    <a class="villa-page__nav-link" href={`/stay/${prev.slug}/`}>
+      <span class="label">PREV</span>
+      <span class="villa-page__nav-name font-en">{prev.name}</span>
+    </a>
+    <a class="villa-page__nav-link villa-page__nav-link--next" href={`/stay/${next.slug}/`}>
+      <span class="label">NEXT</span>
+      <span class="villa-page__nav-name font-en">{next.name}</span>
+    </a>
+  </nav>
+
+  <FinalCta />
+</Base>
+
+<style>
+  .villa-page__intro {
+    display: grid;
+    gap: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .villa-page__text {
+    display: grid;
+    gap: var(--sp-m);
+  }
+
+  .villa-page__best {
+    padding-inline-start: 1rem;
+    border-inline-start: 1px solid var(--accent);
+    color: var(--fg-muted);
+    max-inline-size: 34em;
+  }
+
+  .villa-page__specs {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    border-block-start: 1px solid var(--line);
+    align-content: start;
+  }
+
+  .villa-page__specs div {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    gap: var(--sp-s);
+    padding-block: 0.85rem;
+    border-block-end: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+
+  .villa-page__specs dd {
+    margin: 0;
+  }
+
+  .villa-page__head {
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+
+  .villa-page__plan {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: start;
+  }
+
+  .villa-page__amenities {
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    display: grid;
+    gap: var(--sp-m);
+  }
+
+  .villa-page__amenities ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .villa-page__amenities li {
+    padding-block: 0.8rem;
+    border-block-end: 1px solid var(--line);
+    font-size: var(--fs-small);
+    padding-inline-end: var(--sp-m);
+  }
+
+  .villa-page__rate {
+    display: grid;
+    gap: clamp(2rem, 5vw, 3.5rem);
+    align-items: start;
+  }
+
+  .villa-page__price {
+    display: grid;
+    gap: var(--sp-m);
+    justify-items: start;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border: 1px solid var(--line);
+    background: var(--bg-raised);
+  }
+
+  .villa-page__amount {
+    font-size: clamp(2.25rem, 6vw, 3rem);
+    line-height: 1;
+  }
+
+  .villa-page__unit {
+    font-size: 0.875rem;
+    color: var(--fg-muted);
+    margin-inline-start: 0.4rem;
+    letter-spacing: 0.1em;
+  }
+
+  .villa-page__nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-block: 1px solid var(--line);
+    background: var(--c-obsidian);
+  }
+
+  .villa-page__nav-link {
+    display: grid;
+    gap: 0.4rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem) var(--page-gutter);
+    min-block-size: var(--tap-min);
+    transition: background-color var(--dur-base) var(--ease-out);
+  }
+
+  .villa-page__nav-link--next {
+    text-align: end;
+    justify-items: end;
+    border-inline-start: 1px solid var(--line);
+  }
+
+  .villa-page__nav-link:hover {
+    background: var(--c-forest-deep);
+  }
+
+  .villa-page__nav-name {
+    font-size: clamp(1rem, 3vw, 1.375rem);
+    letter-spacing: 0.14em;
+  }
+
+  @media (min-width: 62em) {
+    .villa-page__intro {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+    }
+
+    .villa-page__plan {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    }
+
+    .villa-page__rate {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+    }
+  }
+</style>

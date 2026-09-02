@@ -1,0 +1,973 @@
+---
+import { MEAL_PLANS, STAY_LIMITS, STAY_OPTIONS } from '../data/pricing';
+import { VILLAS, villaFromRate } from '../data/villas';
+import { DEFAULT_STAY, estimate, yen } from '../lib/pricing';
+import { SITE } from '../data/site';
+
+const initial = estimate(DEFAULT_STAY);
+const maxGuests = Math.max(...VILLAS.map((villa) => villa.capacity.max));
+
+/** JS 無効時のフォールバック用。読み込み時にクライアント側で当日 +2 日へ更新する */
+const earliest = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+const steps = [
+  { id: 'dates', no: '01', label: 'DATES', ja: '日程' },
+  { id: 'guests', no: '02', label: 'GUESTS', ja: '人数' },
+  { id: 'villa', no: '03', label: 'VILLA', ja: 'ヴィラ' },
+  { id: 'meals', no: '04', label: 'MEALS', ja: '食事' },
+  { id: 'confirm', no: '05', label: 'CONFIRM', ja: '確認' },
+];
+---
+
+<div class="bk" data-booking>
+  <ol class="bk__steps" data-step-nav aria-label="予約のステップ">
+    {
+      steps.map((step, index) => (
+        <li class="bk__step" data-step-item={step.id} data-state={index === 0 ? 'current' : 'todo'}>
+          <button
+            class="bk__step-button"
+            type="button"
+            data-step-jump={step.id}
+            aria-current={index === 0 ? 'step' : undefined}
+          >
+            <span class="bk__step-no num">{step.no}</span>
+            <span class="bk__step-label font-en">{step.label}</span>
+            <span class="bk__step-ja">{step.ja}</span>
+          </button>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="bk__progress" data-progress aria-hidden="true">
+    <p class="bk__progress-text">
+      <span class="num" data-progress-no>01</span>
+      <span class="bk__progress-total num">/ 05</span>
+      <span class="bk__progress-label font-en" data-progress-label>DATES</span>
+      <span class="bk__progress-ja" data-progress-ja>日程</span>
+    </p>
+    <span class="bk__progress-bar"><span data-progress-bar></span></span>
+  </div>
+
+  <div class="bk__layout">
+    <form class="bk__form" data-booking-form novalidate>
+      <!-- STEP 01 : 日程 -->
+      <section class="bk__panel" data-panel="dates" aria-labelledby="panel-dates">
+        <h2 class="bk__panel-title" id="panel-dates">
+          <span class="label label--accent">STEP 01</span>
+          <span class="bk__panel-heading font-mincho">いつ泊まりますか。</span>
+        </h2>
+
+        <div class="bk__row">
+          <div class="bk__field">
+            <label class="bk__label" for="check-in">チェックイン日<span class="bk__required">必須</span></label>
+            <input
+              class="bk__input"
+              type="date"
+              id="check-in"
+              name="checkIn"
+              min={earliest}
+              required
+              aria-describedby="check-in-error check-in-help"
+            />
+            <p class="bk__help small" id="check-in-help">ご宿泊の 2 日前までご予約いただけます。</p>
+            <p class="bk__error small" id="check-in-error" data-error="checkIn" role="alert"></p>
+          </div>
+
+          <div class="bk__field">
+            <span class="bk__label" id="nights-label">泊数</span>
+            <div class="bk__stepper" role="group" aria-labelledby="nights-label">
+              <button type="button" class="bk__step-btn" data-step-control="nights" data-delta="-1" aria-label="泊数を減らす">−</button>
+              <input
+                class="bk__number num"
+                type="number"
+                name="nights"
+                inputmode="numeric"
+                value={DEFAULT_STAY.nights}
+                min={STAY_LIMITS.minNights}
+                max={STAY_LIMITS.maxNights}
+                aria-label="泊数"
+                data-input="nights"
+              />
+              <span class="bk__unit">泊</span>
+              <button type="button" class="bk__step-btn" data-step-control="nights" data-delta="1" aria-label="泊数を増やす">＋</button>
+            </div>
+            <p class="bk__help small">最長 7 泊まで。2 泊目から割引が入ります。</p>
+          </div>
+        </div>
+
+        <p class="bk__checkout small" data-checkout-note></p>
+      </section>
+
+      <!-- STEP 02 : 人数 -->
+      <section class="bk__panel" data-panel="guests" aria-labelledby="panel-guests" hidden>
+        <h2 class="bk__panel-title" id="panel-guests">
+          <span class="label label--accent">STEP 02</span>
+          <span class="bk__panel-heading font-mincho">何名で過ごしますか。</span>
+        </h2>
+
+        <div class="bk__field bk__field--narrow">
+          <span class="bk__label" id="guests-label">宿泊人数</span>
+          <div class="bk__stepper" role="group" aria-labelledby="guests-label">
+            <button type="button" class="bk__step-btn" data-step-control="guests" data-delta="-1" aria-label="人数を減らす">−</button>
+            <input
+              class="bk__number num"
+              type="number"
+              name="guests"
+              inputmode="numeric"
+              value={DEFAULT_STAY.guests}
+              min={STAY_LIMITS.minGuests}
+              max={maxGuests}
+              aria-label="宿泊人数"
+              data-input="guests"
+            />
+            <span class="bk__unit">名</span>
+            <button type="button" class="bk__step-btn" data-step-control="guests" data-delta="1" aria-label="人数を増やす">＋</button>
+          </div>
+          <p class="bk__help small">
+            2 名までは一律料金です。3 名以降は 1 名 1 泊につき ¥12,000 を加算します。6 歳未満のお子様のご宿泊は承っていません。
+          </p>
+        </div>
+      </section>
+
+      <!-- STEP 03 : ヴィラ -->
+      <section class="bk__panel" data-panel="villa" aria-labelledby="panel-villa" hidden>
+        <h2 class="bk__panel-title" id="panel-villa">
+          <span class="label label--accent">STEP 03</span>
+          <span class="bk__panel-heading font-mincho">どの棟に泊まりますか。</span>
+        </h2>
+
+        <div class="bk__cards" role="radiogroup" aria-labelledby="panel-villa">
+          {
+            VILLAS.map((villa) => (
+              <label class="bk__card" data-villa-card={villa.id}>
+                <input
+                  type="radio"
+                  name="villa"
+                  value={villa.id}
+                  checked={villa.id === DEFAULT_STAY.villaId}
+                />
+                <span class="bk__card-body">
+                  <span class="bk__card-head">
+                    <span class="bk__card-name font-en">{villa.name}</span>
+                    <span class="bk__card-price num">{yen(villaFromRate(villa.id))}〜</span>
+                  </span>
+                  <span class="bk__card-tagline">{villa.tagline}</span>
+                  <span class="bk__card-meta small">
+                    定員 {villa.capacity.max} 名 / {villa.area} / {villa.sauna}
+                  </span>
+                  <span class="bk__card-warning small" data-villa-warning hidden>
+                    この人数ではお選びいただけません
+                  </span>
+                </span>
+              </label>
+            ))
+          }
+        </div>
+        <p class="bk__error small" data-error="villa" role="alert"></p>
+      </section>
+
+      <!-- STEP 04 : 食事とオプション -->
+      <section class="bk__panel" data-panel="meals" aria-labelledby="panel-meals" hidden>
+        <h2 class="bk__panel-title" id="panel-meals">
+          <span class="label label--accent">STEP 04</span>
+          <span class="bk__panel-heading font-mincho">食事とオプション。</span>
+        </h2>
+
+        <fieldset class="bk__fieldset">
+          <legend class="bk__label">食事プラン</legend>
+          <div class="bk__cards bk__cards--compact">
+            {
+              MEAL_PLANS.map((plan) => (
+                <label class="bk__card">
+                  <input type="radio" name="meal" value={plan.id} checked={plan.id === DEFAULT_STAY.mealPlanId} />
+                  <span class="bk__card-body">
+                    <span class="bk__card-head">
+                      <span class="bk__card-name bk__card-name--sm">{plan.label}</span>
+                      <span class="bk__card-price num">
+                        {plan.perGuestPerNight === 0 ? '±0' : `+${yen(plan.perGuestPerNight)}`}
+                      </span>
+                    </span>
+                    <span class="bk__card-meta small">{plan.note}</span>
+                  </span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <fieldset class="bk__fieldset">
+          <legend class="bk__label">オプション（任意）</legend>
+          <div class="bk__cards bk__cards--compact">
+            {
+              STAY_OPTIONS.map((option) => (
+                <label class="bk__card" data-option-card={option.id}>
+                  <input type="checkbox" name="option" value={option.id} />
+                  <span class="bk__card-body">
+                    <span class="bk__card-head">
+                      <span class="bk__card-name bk__card-name--sm">{option.label}</span>
+                      <span class="bk__card-price num">
+                        +{yen(option.price)}
+                        <span class="bk__card-unit">{option.unit === 'per-night' ? '/ 泊' : '/ 滞在'}</span>
+                      </span>
+                    </span>
+                    <span class="bk__card-meta small">{option.note}</span>
+                    <span class="bk__card-warning small" data-option-warning hidden>
+                      選択中のヴィラでは利用できません
+                    </span>
+                  </span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+      </section>
+
+      <!-- STEP 05 : 確認 -->
+      <section class="bk__panel" data-panel="confirm" aria-labelledby="panel-confirm" hidden>
+        <h2 class="bk__panel-title" id="panel-confirm">
+          <span class="label label--accent">STEP 05</span>
+          <span class="bk__panel-heading font-mincho">内容の確認。</span>
+        </h2>
+
+        <dl class="bk__review" data-review>
+          <div><dt>チェックイン</dt><dd data-review="checkIn">—</dd></div>
+          <div><dt>チェックアウト</dt><dd data-review="checkOut">—</dd></div>
+          <div><dt>泊数・人数</dt><dd data-review="party">—</dd></div>
+          <div><dt>ヴィラ</dt><dd data-review="villa">—</dd></div>
+          <div><dt>食事</dt><dd data-review="meal">—</dd></div>
+          <div><dt>オプション</dt><dd data-review="options">—</dd></div>
+        </dl>
+
+        <div class="bk__contact">
+          <div class="bk__field">
+            <label class="bk__label" for="name">お名前<span class="bk__required">必須</span></label>
+            <input class="bk__input" type="text" id="name" name="name" autocomplete="name" required aria-describedby="name-error" />
+            <p class="bk__error small" id="name-error" data-error="name" role="alert"></p>
+          </div>
+
+          <div class="bk__field">
+            <label class="bk__label" for="email">メールアドレス<span class="bk__required">必須</span></label>
+            <input
+              class="bk__input"
+              type="email"
+              id="email"
+              name="email"
+              autocomplete="email"
+              inputmode="email"
+              required
+              aria-describedby="email-error"
+            />
+            <p class="bk__error small" id="email-error" data-error="email" role="alert"></p>
+          </div>
+
+          <div class="bk__field">
+            <label class="bk__label" for="tel">電話番号<span class="bk__optional">任意</span></label>
+            <input class="bk__input" type="tel" id="tel" name="tel" autocomplete="tel" inputmode="tel" />
+          </div>
+
+          <div class="bk__field bk__field--full">
+            <label class="bk__label" for="note">ご要望・アレルギー<span class="bk__optional">任意</span></label>
+            <textarea class="bk__input bk__textarea" id="note" name="note" rows="4" placeholder="苦手な食材、到着予定時刻など"></textarea>
+          </div>
+        </div>
+
+        <label class="bk__agree">
+          <input type="checkbox" name="agree" required aria-describedby="agree-error" />
+          <span>
+            キャンセルポリシー（7 日前まで無料 / 6 – 3 日前 30% / 前々日・前日 50% / 当日 100%）に同意します。
+          </span>
+        </label>
+        <p class="bk__error small" id="agree-error" data-error="agree" role="alert"></p>
+
+        <p class="bk__notice">
+          <span class="label label--accent">{SITE.conceptNotice.label}</span>
+          {SITE.conceptNotice.label} のため、実際の予約は送信されません。入力内容がサーバーへ送られることはありません。
+        </p>
+      </section>
+
+      <!-- 完了パネル -->
+      <section class="bk__done" data-done hidden aria-live="polite">
+        <p class="label label--accent">DEMO COMPLETE</p>
+        <h2 class="bk__done-title font-mincho">この画面で予約フローは完了です。</h2>
+        <p class="body">
+          実際のサービスであれば、ここで予約確認メールが送信されます。EMBER &amp; MOSS は自主制作のコンセプトプロジェクトのため、入力内容は送信も保存もされません。
+        </p>
+        <dl class="bk__review" data-done-review></dl>
+        <div class="bk__done-actions">
+          <button class="btn btn--ghost" type="button" data-restart><span class="btn__label">はじめからやり直す</span></button>
+          <a class="btn btn--solid" href="/project/"><span class="btn__label">この制作について</span></a>
+        </div>
+      </section>
+
+      <div class="bk__nav" data-nav>
+        <button class="btn btn--ghost" type="button" data-prev hidden><span class="btn__label">戻る</span></button>
+        <button class="btn btn--primary" type="button" data-next><span class="btn__label">次へ進む</span></button>
+        <button class="btn btn--primary" type="submit" data-submit hidden><span class="btn__label">この内容で予約する</span></button>
+      </div>
+    </form>
+
+    <aside class="bk__summary" aria-label="料金の概算">
+      <h2 class="bk__summary-title label">RESERVATION SUMMARY</h2>
+
+      <dl class="bk__lines" aria-live="polite">
+        <div class="bk__line">
+          <dt data-summary="stay-label">宿泊（1 泊 2 名）</dt>
+          <dd class="num" data-summary="accommodation">{yen(initial.accommodationTotal)}</dd>
+        </div>
+        <div class="bk__line" data-summary-row="discount" hidden>
+          <dt data-summary="discount-label">連泊割引</dt>
+          <dd class="num bk__line--discount" data-summary="discount">{yen(0)}</dd>
+        </div>
+        <div class="bk__line" data-summary-row="meals">
+          <dt>食事</dt>
+          <dd class="num" data-summary="meals">{yen(initial.mealTotal)}</dd>
+        </div>
+        <div class="bk__line" data-summary-row="options" hidden>
+          <dt>オプション</dt>
+          <dd class="num" data-summary="options">{yen(0)}</dd>
+        </div>
+        <div class="bk__line">
+          <dt>入湯税</dt>
+          <dd class="num" data-summary="tax">{yen(initial.bathingTax)}</dd>
+        </div>
+      </dl>
+
+      <p class="bk__total">
+        <span class="label">合計（税・サービス料込）</span>
+        <span class="bk__total-amount num" data-summary="total">{yen(initial.total)}</span>
+        <span class="small bk__total-note" data-summary="per-night">
+          1 名 1 泊あたり {yen(initial.perGuestPerNight)}
+        </span>
+      </p>
+
+      <p class="bk__summary-note small">
+        料金はすべて架空の設定です。入湯税のみ現地精算を想定しています。
+      </p>
+    </aside>
+  </div>
+
+  <!-- モバイル用の固定バー -->
+  <div class="bk__bar" data-mobile-bar>
+    <div class="bk__bar-price">
+      <span class="label">合計</span>
+      <span class="num bk__bar-amount" data-summary="total-mobile">{yen(initial.total)}</span>
+    </div>
+    <button class="bk__bar-btn" type="button" data-next-mobile>次へ進む</button>
+  </div>
+</div>
+
+<script>
+  import { initBooking } from '../scripts/booking';
+  initBooking();
+</script>
+
+<style>
+  .bk {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3rem);
+  }
+
+  /* ---- ステップナビ ---- */
+  .bk__steps {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-block-end: 1px solid var(--line);
+  }
+
+  .bk__steps::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bk__step {
+    flex: 1 0 auto;
+    min-inline-size: 6.5rem;
+    position: relative;
+  }
+
+  .bk__step-button {
+    inline-size: 100%;
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.85rem 0.5rem 1rem;
+    text-align: start;
+    min-block-size: var(--tap-min);
+    color: var(--fg-faint);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  .bk__step::after {
+    content: '';
+    position: absolute;
+    inset-block-end: -1px;
+    inset-inline: 0;
+    block-size: 1px;
+    background: var(--c-ember);
+    scale: 0 1;
+    transform-origin: left;
+    transition: scale var(--dur-base) var(--ease-out);
+  }
+
+  .bk__step[data-state='current']::after,
+  .bk__step[data-state='done']::after {
+    scale: 1 1;
+  }
+
+  .bk__step[data-state='current'] .bk__step-button {
+    color: var(--fg);
+  }
+
+  .bk__step[data-state='done'] .bk__step-button {
+    color: var(--fg-muted);
+  }
+
+  .bk__step[data-state='todo'] .bk__step-button {
+    cursor: default;
+  }
+
+  .bk__step-no {
+    font-size: 0.625rem;
+    letter-spacing: 0.2em;
+  }
+
+  .bk__step-label {
+    font-size: var(--fs-label);
+    letter-spacing: 0.16em;
+  }
+
+  .bk__step-ja {
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+  }
+
+  .bk__progress {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .bk__progress-text {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: var(--fs-small);
+  }
+
+  .bk__progress-total {
+    font-size: var(--fs-label);
+    color: var(--fg-faint);
+    margin-inline-end: 0.4rem;
+  }
+
+  .bk__progress-label {
+    letter-spacing: 0.18em;
+    font-size: var(--fs-label);
+    color: var(--fg-muted);
+  }
+
+  .bk__progress-ja {
+    font-size: var(--fs-label);
+    color: var(--fg-faint);
+    margin-inline-start: auto;
+  }
+
+  .bk__progress-bar {
+    display: block;
+    block-size: 2px;
+    background: var(--line);
+  }
+
+  .bk__progress-bar span {
+    display: block;
+    block-size: 100%;
+    inline-size: var(--progress, 20%);
+    background: var(--c-ember);
+    transition: inline-size var(--dur-base) var(--ease-out);
+  }
+
+  /* ---- レイアウト ---- */
+  .bk__layout {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3rem);
+    align-items: start;
+  }
+
+  .bk__panel {
+    display: grid;
+    gap: clamp(1.25rem, 2.5vw, 1.75rem);
+  }
+
+  .bk__panel-title {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .bk__panel-heading {
+    font-size: clamp(1.375rem, 4vw, 2rem);
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+  }
+
+  .bk__row {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  }
+
+  .bk__field {
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+  }
+
+  .bk__field--narrow {
+    max-inline-size: 20rem;
+  }
+
+  .bk__label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: var(--fs-small);
+    letter-spacing: 0.08em;
+    color: var(--fg);
+  }
+
+  .bk__required,
+  .bk__optional {
+    font-family: var(--font-en);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    padding: 0.15em 0.5em;
+    border: 1px solid currentColor;
+  }
+
+  .bk__required {
+    color: var(--c-ember-bright);
+  }
+
+  .bk__optional {
+    color: var(--fg-faint);
+  }
+
+  .bk__input {
+    inline-size: 100%;
+    min-block-size: var(--tap-min);
+    padding: 0.7rem 0.9rem;
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    color: var(--fg);
+    font-size: 1rem;
+    transition: border-color var(--dur-fast) var(--ease-out);
+  }
+
+  .bk__input:hover {
+    border-color: var(--fg-muted);
+  }
+
+  .bk__input:focus-visible {
+    border-color: var(--c-ember-bright);
+  }
+
+  .bk__input[aria-invalid='true'] {
+    border-color: #d98a6a;
+  }
+
+  .bk__textarea {
+    min-block-size: 6rem;
+    resize: vertical;
+    line-height: 1.8;
+  }
+
+  .bk__help {
+    color: var(--fg-faint);
+  }
+
+  .bk__error {
+    color: #e0a48c;
+    min-block-size: 0;
+  }
+
+  .bk__error:empty {
+    display: none;
+  }
+
+  .bk__checkout {
+    color: var(--fg-muted);
+  }
+
+  .bk__stepper {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--line-strong);
+    padding: 0.3rem;
+  }
+
+  .bk__step-btn {
+    inline-size: var(--tap-min);
+    block-size: var(--tap-min);
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
+    color: var(--fg);
+  }
+
+  .bk__step-btn:hover:not([disabled]) {
+    background: rgba(216, 208, 195, 0.1);
+  }
+
+  .bk__step-btn[disabled] {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .bk__number {
+    flex: 1;
+    min-inline-size: 0;
+    text-align: center;
+    font-size: 1.25rem;
+    background: none;
+    border: none;
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+
+  .bk__number::-webkit-outer-spin-button,
+  .bk__number::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .bk__unit {
+    font-size: var(--fs-small);
+    color: var(--fg-muted);
+  }
+
+  .bk__fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--sp-s);
+  }
+
+  .bk__cards {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .bk__card {
+    position: relative;
+    display: block;
+    border: 1px solid var(--line);
+    padding: clamp(0.9rem, 2vw, 1.2rem);
+    cursor: pointer;
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out),
+      opacity var(--dur-fast) var(--ease-out);
+  }
+
+  .bk__card input {
+    position: absolute;
+    opacity: 0;
+    inline-size: 1px;
+    block-size: 1px;
+  }
+
+  .bk__card:hover {
+    border-color: var(--line-strong);
+  }
+
+  .bk__card:has(input:checked) {
+    border-color: var(--c-ember);
+    background: rgba(184, 118, 67, 0.1);
+  }
+
+  .bk__card:has(input:focus-visible) {
+    outline: 2px solid var(--c-ember-bright);
+    outline-offset: 2px;
+  }
+
+  .bk__card:has(input:disabled) {
+    opacity: 0.42;
+    cursor: not-allowed;
+  }
+
+  .bk__card-body {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .bk__card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-s);
+  }
+
+  .bk__card-name {
+    font-family: var(--font-en);
+    font-size: 1.0625rem;
+    letter-spacing: 0.14em;
+  }
+
+  .bk__card-name--sm {
+    font-family: var(--font-ja);
+    font-size: var(--fs-small);
+    letter-spacing: 0.08em;
+  }
+
+  .bk__card-price {
+    color: var(--c-ember-bright);
+    font-size: var(--fs-small);
+    white-space: nowrap;
+  }
+
+  .bk__card-unit {
+    font-size: 0.625rem;
+    color: var(--fg-faint);
+    margin-inline-start: 0.25em;
+  }
+
+  .bk__card-tagline {
+    font-size: var(--fs-small);
+    color: var(--fg-muted);
+  }
+
+  .bk__card-meta {
+    color: var(--fg-faint);
+  }
+
+  .bk__card-warning {
+    color: #e0a48c;
+  }
+
+  .bk__review {
+    display: grid;
+    margin: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .bk__review div {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: var(--sp-s);
+    padding-block: 0.8rem;
+    border-block-end: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+
+  .bk__review dt {
+    color: var(--fg-faint);
+  }
+
+  .bk__review dd {
+    margin: 0;
+  }
+
+  .bk__contact {
+    display: grid;
+    gap: clamp(1rem, 2.5vw, 1.5rem);
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+
+  .bk__field--full {
+    grid-column: 1 / -1;
+  }
+
+  .bk__agree {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem;
+    align-items: start;
+    font-size: var(--fs-small);
+    line-height: 1.8;
+    cursor: pointer;
+    padding-block: 0.5rem;
+  }
+
+  .bk__agree input {
+    inline-size: 1.15rem;
+    block-size: 1.15rem;
+    accent-color: var(--c-ember);
+    translate: 0 0.35em;
+  }
+
+  .bk__notice {
+    display: grid;
+    gap: 0.4rem;
+    padding: var(--sp-m);
+    border: 1px solid var(--line);
+    font-size: var(--fs-small);
+    color: var(--fg-muted);
+    line-height: 1.85;
+  }
+
+  .bk__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding-block-start: var(--sp-m);
+    border-block-start: 1px solid var(--line);
+  }
+
+  .bk__nav .btn {
+    flex: 1 1 10rem;
+  }
+
+  .bk__done {
+    display: grid;
+    gap: var(--sp-m);
+  }
+
+  .bk__done-title {
+    font-size: clamp(1.5rem, 4.5vw, 2.25rem);
+    letter-spacing: 0.06em;
+    line-height: 1.4;
+  }
+
+  .bk__done-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: var(--sp-s);
+  }
+
+  /* ---- サマリー ---- */
+  .bk__summary {
+    display: grid;
+    gap: var(--sp-m);
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--line);
+    background: var(--bg-raised);
+  }
+
+  .bk__summary-title {
+    color: var(--fg-faint);
+  }
+
+  .bk__lines {
+    display: grid;
+    margin: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .bk__line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-s);
+    padding-block: 0.7rem;
+    border-block-end: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+
+  .bk__line dd {
+    margin: 0;
+  }
+
+  .bk__line--discount {
+    color: var(--c-ember-bright);
+  }
+
+  .bk__total {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .bk__total-amount {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    line-height: 1.05;
+  }
+
+  .bk__total-note,
+  .bk__summary-note {
+    color: var(--fg-faint);
+  }
+
+  /* ---- モバイル固定バー ---- */
+  .bk__bar {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: var(--z-bar);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-s);
+    padding: 0.7rem var(--page-gutter);
+    padding-bottom: calc(0.7rem + env(safe-area-inset-bottom, 0px));
+    background: rgba(12, 14, 13, 0.95);
+    backdrop-filter: blur(14px);
+    border-block-start: 1px solid var(--line);
+  }
+
+  .bk__bar-price {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .bk__bar-amount {
+    font-size: 1.0625rem;
+    line-height: 1.1;
+  }
+
+  .bk__bar-btn {
+    min-block-size: var(--tap-min);
+    padding-inline: 1.5rem;
+    background: var(--c-ember);
+    color: #fff;
+    font-size: var(--fs-small);
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+
+  /* モバイル：ステップ一覧は読み上げ用に残し、表示は進捗バーへ置き換える */
+  @media (max-width: 61.99em) {
+    .bk__steps {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .bk__nav [data-next],
+    .bk__nav [data-submit] {
+      display: none;
+    }
+
+    .bk__nav:has([data-prev][hidden]) {
+      display: none;
+    }
+  }
+
+  @media (min-width: 62em) {
+    .bk__progress {
+      display: none;
+    }
+
+    .bk__layout {
+      grid-template-columns: minmax(0, 1.35fr) minmax(19rem, 0.65fr);
+      column-gap: clamp(2.5rem, 5vw, 4rem);
+    }
+
+    .bk__summary {
+      position: sticky;
+      top: calc(var(--header-h) + 2rem);
+    }
+
+    .bk__bar {
+      display: none;
+    }
+
+    .bk__cards--compact {
+      grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    }
+  }
+</style>
