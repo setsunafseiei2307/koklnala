@@ -15,9 +15,10 @@
     "test:e2e": "node --import ./scripts/ts-resolve.mjs scripts/e2e-booking.mjs",
     "qa:screenshots": "node scripts/screenshot.mjs",
     "images:placeholders": "node scripts/generate-placeholders.mjs",
-    "images:import": "node scripts/import-images.mjs",
+    "images:import": "node --import ./scripts/ts-resolve.mjs scripts/import-images.mjs",
     "fonts": "node scripts/build-fonts.mjs",
-    "assets:brand": "node scripts/generate-brand-assets.mjs"
+    "assets:brand": "node scripts/generate-brand-assets.mjs",
+    "docs:images": "node --import ./scripts/ts-resolve.mjs scripts/build-image-docs.mjs"
   },
   "dependencies": {
     "astro": "^7.2.10"
