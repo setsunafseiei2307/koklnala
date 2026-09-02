@@ -870,7 +870,8 @@ const steps = [
     border-block-start: 1px solid var(--line);
   }
 
-  .bk__review div {
+  /* 完了パネルの行は JS で生成するため :global で当てる */
+  .bk__review :global(div) {
     display: grid;
     grid-template-columns: 8rem 1fr;
     gap: var(--sp-s);
@@ -879,11 +880,11 @@ const steps = [
     font-size: var(--fs-small);
   }
 
-  .bk__review dt {
+  .bk__review :global(dt) {
     color: var(--fg-faint);
   }
 
-  .bk__review dd {
+  .bk__review :global(dd) {
     margin: 0;
   }
 

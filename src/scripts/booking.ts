@@ -124,6 +124,8 @@ export function initBooking(): void {
     navRow.hidden = false;
     mobileBar.hidden = false;
     root.querySelector<HTMLElement>('[data-step-nav]')!.hidden = false;
+    const progress = root.querySelector<HTMLElement>('[data-progress]');
+    if (progress) progress.hidden = false;
     furthest = 0;
     showStep(0);
   });
@@ -412,6 +414,8 @@ export function initBooking(): void {
       if (panel) panel.hidden = true;
     }
     root.querySelector<HTMLElement>('[data-step-nav]')!.hidden = true;
+    const progressBar = root.querySelector<HTMLElement>('[data-progress]');
+    if (progressBar) progressBar.hidden = true;
     navRow.hidden = true;
     mobileBar.hidden = true;
     donePanel.hidden = false;

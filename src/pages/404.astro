@@ -55,10 +55,16 @@ import { NAV } from '../data/site';
       var(--c-obsidian);
   }
 
+  /* サイト全体と同じ左揃えのグリッドに合わせる */
   .nf__inner {
     display: grid;
     gap: var(--sp-m);
+    justify-items: start;
+  }
+
+  .nf__inner > * {
     max-inline-size: 46rem;
+    inline-size: 100%;
   }
 
   .nf__code {
