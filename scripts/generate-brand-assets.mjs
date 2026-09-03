@@ -43,27 +43,44 @@ async function main() {
   // --- OG image ---
   const width = 1200;
   const height = 630;
+  // 下地は暗くしすぎない。SNS のカードは小さく表示されるため、
+  // 建築が判別できることを優先し、文字は下部の暗部だけに載せる。
   const base = await sharp(path.join(root, 'src/assets/images/og-image.webp'))
     .resize(width, height, { fit: 'cover' })
-    .modulate({ brightness: 0.82 })
+    .modulate({ brightness: 1.06 })
     .toBuffer();
 
   const overlay = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
     <defs>
-      <linearGradient id="scrim" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#0C0E0D" stop-opacity="0.55"/>
-        <stop offset="55%" stop-color="#0C0E0D" stop-opacity="0.72"/>
-        <stop offset="100%" stop-color="#0C0E0D" stop-opacity="0.92"/>
+      <!-- 上：ロゴを置くぶんだけ落とす / 下：コピーを載せるため深く落とす -->
+      <linearGradient id="top" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#0C0E0D" stop-opacity="0.62"/>
+        <stop offset="100%" stop-color="#0C0E0D" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="bottom" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#0C0E0D" stop-opacity="0"/>
+        <stop offset="38%" stop-color="#0C0E0D" stop-opacity="0.72"/>
+        <stop offset="100%" stop-color="#0C0E0D" stop-opacity="0.95"/>
+      </linearGradient>
+      <!-- 左からの回り込み。建築のある右側は残す -->
+      <linearGradient id="side" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#0C0E0D" stop-opacity="0.5"/>
+        <stop offset="52%" stop-color="#0C0E0D" stop-opacity="0.12"/>
+        <stop offset="100%" stop-color="#0C0E0D" stop-opacity="0"/>
       </linearGradient>
     </defs>
-    <rect width="${width}" height="${height}" fill="url(#scrim)"/>
+    <rect width="${width}" height="${height}" fill="url(#side)"/>
+    <rect width="${width}" height="188" fill="url(#top)"/>
+    <rect y="286" width="${width}" height="344" fill="url(#bottom)"/>
+
     <circle cx="96" cy="92" r="9" fill="${EMBER}"/>
-    <text x="122" y="99" font-family="Jost" font-size="26" letter-spacing="7" fill="${IVORY}" fill-opacity="0.92">EMBER &amp; MOSS</text>
-    <text x="96" y="336" font-family="Shippori Mincho" font-size="86" letter-spacing="8" fill="${IVORY}">熱と静寂に泊まる。</text>
-    <text x="96" y="418" font-family="Jost" font-size="23" letter-spacing="10" fill="${IVORY}" fill-opacity="0.62">PRIVATE VILLA / SAUNA / HAKONE</text>
-    <rect x="96" y="486" width="64" height="1" fill="${EMBER}"/>
-    <text x="96" y="546" font-family="Jost" font-size="19" letter-spacing="5" fill="${EMBER}">CONCEPT PROJECT</text>
-    <text x="96" y="580" font-family="Zen Kaku Gothic New" font-size="19" letter-spacing="2" fill="${IVORY}" fill-opacity="0.55">架空の宿泊施設を想定した自主制作です。</text>
+    <text x="122" y="99" font-family="Jost" font-size="26" letter-spacing="7" fill="${IVORY}" fill-opacity="0.95">EMBER &amp; MOSS</text>
+
+    <text x="96" y="466" font-family="Shippori Mincho" font-size="78" letter-spacing="8" fill="${IVORY}">熱と静寂に泊まる。</text>
+    <text x="96" y="518" font-family="Jost" font-size="21" letter-spacing="10" fill="${IVORY}" fill-opacity="0.72">PRIVATE VILLA / SAUNA / HAKONE</text>
+    <rect x="96" y="556" width="56" height="1" fill="${EMBER}"/>
+    <text x="96" y="598" font-family="Jost" font-size="17" letter-spacing="5" fill="${EMBER}">CONCEPT PROJECT</text>
+    <text x="356" y="598" font-family="Zen Kaku Gothic New" font-size="17" letter-spacing="2" fill="${IVORY}" fill-opacity="0.5">架空の宿泊施設を想定した自主制作です。</text>
   </svg>`;
 
   await sharp(base)

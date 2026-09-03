@@ -51,7 +51,8 @@ const from = Math.min(...Object.values(VILLA_BASE_RATE)).toLocaleString('ja-JP')
 
 <style>
   .bhead {
-    padding-block: calc(var(--header-h) + clamp(2.5rem, 6vw, 4.5rem)) clamp(2rem, 5vw, 3.5rem);
+    /* 予約 UI をできるだけ早く見せるため、狭い画面では前置きを詰める */
+    padding-block: calc(var(--header-h) + clamp(1.5rem, 6vw, 4.5rem)) clamp(1.75rem, 5vw, 3.5rem);
     background:
       radial-gradient(80% 60% at 88% 0%, rgba(184, 118, 67, 0.13), transparent 60%),
       var(--c-obsidian);
@@ -154,6 +155,23 @@ const from = Math.min(...Object.values(VILLA_BASE_RATE)).toLocaleString('ja-JP')
   @media (max-width: 61.99em) {
     .bsec {
       padding-block-end: 7rem;
+    }
+  }
+
+  /* 狭い画面では見出し周りの行間を詰め、STEP 01 を折り返し前に見せる */
+  @media (max-width: 47.99em) {
+    .bhead__inner {
+      gap: var(--sp-s);
+    }
+
+    .bhead__facts {
+      margin-block-start: 0;
+      padding-block-start: var(--sp-s);
+      gap: 0.75rem var(--sp-m);
+    }
+
+    .bsec {
+      padding-block-start: var(--sp-m);
     }
   }
 </style>

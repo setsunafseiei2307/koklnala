@@ -6,6 +6,62 @@ import { SITE } from '../../data/site';
 
 const roles = ['Direction', 'Information Architecture', 'UI / UX Design', 'Art Direction', 'Copywriting', 'Frontend Development', 'Interaction Design'];
 
+/** 検証できる数値だけを並べる（成果を誇張しない） */
+const metrics = [
+  { value: '11', unit: 'ページ', label: 'SCOPE' },
+  { value: '5', unit: 'ステップ', label: 'BOOKING UI' },
+  { value: '49', unit: '件', label: 'AUTOMATED TESTS' },
+  { value: '1/8', unit: 'に圧縮', label: 'JP WEBFONT' },
+];
+
+/** ブランド定義から情報設計までの、実案件と同じ手順 */
+const foundation = [
+  {
+    no: '01',
+    label: '課題',
+    title: '写真が良いだけでは、予約されない。',
+    body: '宿泊施設のサイトで離脱が起きるのは、たいてい「いくらか分からない」「自分の人数で泊まれるか分からない」地点です。写真の質より先に、その 2 つを解く導線を設計対象にしました。',
+  },
+  {
+    no: '02',
+    label: '想定ユーザー',
+    title: '30〜40 代、2 名。スマホで探して、PC で決める。',
+    body: '記念日や連休の宿を、通勤中にスマホで探す層を主役に置きました。だから比較表は横スクロールで、料金は入力したその場で動き、予約 UI はステップ形式です。',
+  },
+  {
+    no: '03',
+    label: 'ブランド設計',
+    title: '足すのではなく、引いて決めた。',
+    body: '「熱と静寂に泊まる。」を先に決め、そこから外れる要素を落としました。黒・森・石・木・熾火の 5 色、書体は 3 種類、アニメーションは出現と遷移のみ。高級感を演出で作らず、余白と比率で作る方針です。',
+  },
+  {
+    no: '04',
+    label: '情報設計',
+    title: '読む順番を、意思決定の順番に合わせた。',
+    body: 'ブランド理解 → 棟の比較 → サウナ → 滞在 → 料金 → アクセス → 写真 → FAQ → 予約。TOP はこの 9 段で構成し、各段の終わりに次の段への問いが残るようにコピーを置いています。',
+  },
+];
+
+/** 写真は「生成して終わり」ではなく、用途から逆算して設計している */
+const artDirection = [
+  {
+    label: '構図を用途から決める',
+    body: '20 枚それぞれに、掲載面・アスペクト比・被写体の位置・光の時間帯を先に定義しました。HERO は 16:9 で右に建築・左に暗部、外気浴と森は 2:3 の縦、素材ディテールは 1:1。レイアウトが先で、写真は後です。',
+  },
+  {
+    label: 'トーンを 1 本の撮影に揃える',
+    body: '曇天と朝霧、日没直後の青い時間に限定し、彩度とコントラストを抑えています。1 枚ずつ良くするのではなく、20 枚を並べたときに同じ撮影に見えることを基準にしました。',
+  },
+  {
+    label: 'Web 用に作り直す',
+    body: '生成した原版をそのまま置かず、用途ごとに中央基準でトリミングして推奨サイズへ縮小し、WebP へ変換してから取り込んでいます。ビルド時に AVIF / WebP と srcset を自動生成し、掲載面ごとに sizes を指定しています。',
+  },
+  {
+    label: '画面幅でトリミングを変える',
+    body: '横長の原版をスマホの縦画面に置くと主役が切れるため、object-position を画面幅で切り替えています。HERO は狭い画面で建築側に寄せ、広い画面では中央へ戻します。',
+  },
+];
+
 const decisions = [
   {
     no: '01',
@@ -41,8 +97,8 @@ const stack = [
   { label: 'JavaScript', value: '約 13〜16KB（gzip）/ UI ライブラリ・アニメーションライブラリなし' },
   { label: 'Images', value: 'astro:assets による AVIF / WebP 生成' },
   { label: 'Fonts', value: 'Jost / Zen Kaku Gothic New / しっぽり明朝（サブセット自己ホスト）' },
-  { label: 'Testing', value: 'Vitest（料金ロジック）/ Playwright（表示・横スクロール検証）' },
-  { label: 'Hosting', value: 'Cloudflare Pages などの静的ホスティングを想定' },
+  { label: 'Testing', value: 'Vitest 22 件（料金ロジック）/ Playwright 27 件（予約フロー・表示検証）' },
+  { label: 'Hosting', value: 'Cloudflare Workers（静的アセット配信）/ GitHub 連携で自動ビルド' },
 ];
 ---
 
@@ -61,6 +117,23 @@ const stack = [
       <p class="label label--accent">{SITE.conceptNotice.label}</p>
       <h1 class="phead__title font-mincho" id="project-title">この宿は、存在しません。</h1>
       <p class="phead__lead lead">{SITE.conceptNotice.long}</p>
+      <p class="phead__note small">
+        架空なのは施設だけです。要件定義・情報設計・アートディレクション・実装・検証は、実案件と同じ手順で進めています。
+      </p>
+
+      <dl class="phead__metrics">
+        {
+          metrics.map((metric) => (
+            <div>
+              <dt class="label">{metric.label}</dt>
+              <dd>
+                <span class="num phead__metric-value">{metric.value}</span>
+                <span class="phead__metric-unit">{metric.unit}</span>
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
     </div>
   </section>
 
@@ -93,17 +166,46 @@ const stack = [
         <dt class="label">CATEGORY</dt>
         <dd>Luxury Villa / Hospitality</dd>
         <dt class="label">PAGES</dt>
-        <dd>TOP / STAY（一覧・詳細 3 棟）/ SAUNA / EXPERIENCE / ACCESS &amp; FAQ / BOOKING / 404</dd>
+        <dd>全 11 ページ — TOP / STAY（一覧・詳細 3 棟）/ SAUNA / EXPERIENCE / ACCESS &amp; FAQ / BOOKING / ABOUT THIS PROJECT / 404</dd>
       </dl>
     </div>
   </section>
 
-  <section class="section on-stone" aria-labelledby="decision-title">
+  <section class="section on-stone" aria-labelledby="approach-title">
+    <div class="shell">
+      <div class="project__head">
+        <SectionHeading
+          id="approach-title"
+          index="02"
+          label="APPROACH"
+          title="課題から、画面までの順番。"
+          lead="架空案件でも、決める順番は実案件と変えていません。誰の、どの迷いを、どの画面で解くのかを先に決めています。"
+        />
+      </div>
+
+      <ol class="project__foundation">
+        {
+          foundation.map((item) => (
+            <li data-reveal>
+              <p class="project__foundation-meta">
+                <span class="num project__no">{item.no}</span>
+                <span class="label">{item.label}</span>
+              </p>
+              <h3 class="project__foundation-title font-mincho">{item.title}</h3>
+              <p class="small">{item.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section on-forest" aria-labelledby="decision-title">
     <div class="shell">
       <div class="project__head">
         <SectionHeading
           id="decision-title"
-          index="02"
+          index="03"
           label="DESIGN DECISIONS"
           title="設計で決めたこと。"
         />
@@ -122,15 +224,44 @@ const stack = [
     </div>
   </section>
 
-  <section class="section on-forest" aria-labelledby="stack-title">
+  <section class="section on-light" aria-labelledby="art-title">
+    <div class="shell">
+      <div class="project__head">
+        <SectionHeading
+          id="art-title"
+          index="04"
+          label="ART DIRECTION"
+          title="写真は、レイアウトから逆算した。"
+          lead="掲載している 20 枚は生成画像です。ただし「生成して貼る」ことはしていません。用途・比率・光・被写体の位置を先に定義し、Web に載る形まで作り込んでいます。"
+        />
+      </div>
+
+      <ul class="project__art">
+        {
+          artDirection.map((item) => (
+            <li data-reveal>
+              <h3 class="project__art-title">{item.label}</h3>
+              <p class="small">{item.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="body project__note">
+        1 枚の写真の良し悪しではなく、20 枚を通したときにひとつの宿に見えるかどうかを基準にしています。撮影指示書にあたる用途別のプロンプトと比率定義は、リポジトリの docs に置いています。
+      </p>
+    </div>
+  </section>
+
+  <section class="section on-stone" aria-labelledby="stack-title">
     <div class="shell project__grid">
       <div>
-        <SectionHeading id="stack-title" index="03" label="TECH" title="使っている技術。" />
+        <SectionHeading id="stack-title" index="05" label="TECH" title="使っている技術。" />
         <p class="body">
           派手さより、更新しやすさと表示速度を優先しています。アニメーションのためだけのライブラリは入れていません。
         </p>
-        <p class="body project__note">
-          写真は AI 生成画像への差し替えを前提に設計しています。現在表示されているのは、比率とトーンを合わせた仮画像です。差し替え手順とプロンプトはリポジトリの docs にまとめています。
+        <p class="body">
+          料金計算は型で守り、予約フローは自動テストで通しています。仕様が変わっても壊れたことに気づける状態を、納品物の一部と考えています。
         </p>
       </div>
 
@@ -203,6 +334,92 @@ const stack = [
 
   .phead__lead {
     color: var(--fg-muted);
+  }
+
+  .phead__note {
+    color: var(--fg-faint);
+    max-inline-size: 46em;
+    line-height: 1.9;
+  }
+
+  .phead__metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-s) var(--sp-m);
+    margin: var(--sp-s) 0 0;
+    padding-block-start: var(--sp-m);
+    border-block-start: 1px solid var(--line);
+  }
+
+  .phead__metrics div {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .phead__metrics dd {
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+
+  .phead__metric-value {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    line-height: 1;
+    color: var(--c-ivory);
+  }
+
+  .phead__metric-unit {
+    font-size: var(--fs-small);
+    color: var(--fg-faint);
+  }
+
+  .project__foundation,
+  .project__art {
+    display: grid;
+    gap: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .project__foundation li,
+  .project__art li {
+    display: grid;
+    gap: 0.5rem;
+    padding-block: clamp(1.25rem, 3vw, 2rem);
+    border-block-end: 1px solid var(--line);
+  }
+
+  .project__foundation-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .project__foundation-meta .label {
+    color: var(--fg-faint);
+  }
+
+  .project__foundation-title {
+    font-size: var(--fs-h3);
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+  }
+
+  .project__art-title {
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+  }
+
+  .project__foundation p.small,
+  .project__art p.small {
+    color: var(--fg-muted);
+    max-inline-size: 44em;
+  }
+
+  .project__art + .project__note {
+    margin-top: clamp(2rem, 4vw, 3rem);
+    max-inline-size: 48em;
   }
 
   .project__grid {
@@ -294,13 +511,21 @@ const stack = [
     max-inline-size: 48em;
   }
 
+  @media (min-width: 48em) {
+    .phead__metrics {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
   @media (min-width: 62em) {
     .project__grid {
       grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
       column-gap: clamp(3rem, 6vw, 6rem);
     }
 
-    .project__decisions {
+    .project__decisions,
+    .project__foundation,
+    .project__art {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       column-gap: clamp(2.5rem, 5vw, 4rem);
     }
