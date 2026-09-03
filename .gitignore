@@ -6,3 +6,6 @@ dist/
 test-results/
 .playwright/
 screenshots/
+images-src/*.png
+images-src/*.jpg
+images-src/*.jpeg
