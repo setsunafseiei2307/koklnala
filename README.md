@@ -30,7 +30,7 @@
 | 画像 | `astro:assets`（AVIF / WebP 自動生成） | srcset・寸法・遅延読み込みを自動化するため |
 | フォント | Jost / Zen Kaku Gothic New / しっぽり明朝（自己ホスト・サブセット） | 日本語フォントの転送量を約 1/8 に抑えるため |
 | テスト | Vitest（料金ロジック）/ Playwright（予約フロー・表示検証） | 金額とフォームは自動で守る必要があるため |
-| ホスティング | Cloudflare Pages などの静的ホスティングを想定 | `dist/` を配置するだけで公開できる |
+| ホスティング | Cloudflare Workers（静的アセット配信）| `wrangler.jsonc` の `assets.directory` に `dist/` を指定し、GitHub 連携で自動ビルド・公開 |
 
 UI ライブラリ・アニメーションライブラリは使用していません。ページあたりの JavaScript は gzip 約 13〜16KB（うち約 5KB は Astro のページ遷移機能）です。
 
