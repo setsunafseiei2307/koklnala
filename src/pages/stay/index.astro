@@ -1,0 +1,139 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import VillaCompare from '../../components/VillaCompare.astro';
+import VillaRow from '../../components/VillaRow.astro';
+import FinalCta from '../../components/FinalCta.astro';
+import { VILLAS } from '../../data/villas';
+---
+
+<Base
+  title="STAY / 客室"
+  description="EMBER & MOSS の 3 棟（FOREST / STONE / MIST）の広さ・定員・風呂・サウナ・料金を比較できます。すべて一棟貸し、専用サウナ付き。1 泊 68,000 円〜。"
+>
+  <PageHero
+    label="STAY"
+    title="どの森を見て、眠るか。"
+    lead="3 棟はすべて一棟貸しです。向き、素材、天井の高さ、湯船の形。違うのはその 4 つで、静けさだけは同じにしています。"
+    image="forest-villa-exterior"
+  />
+
+  <section class="section on-light" aria-labelledby="cmp-title">
+    <div class="shell">
+      <div class="stay__head">
+        <SectionHeading
+          id="cmp-title"
+          index="01"
+          label="COMPARE"
+          title="3 棟をくらべる。"
+          lead="迷ったら、人数と風呂で選んでください。5 名まで泊まれるのは STONE、2 名専用は MIST です。"
+        />
+      </div>
+      <VillaCompare />
+    </div>
+  </section>
+
+  <section class="section on-stone" aria-labelledby="rooms-title">
+    <div class="shell">
+      <div class="stay__head">
+        <SectionHeading id="rooms-title" index="02" label="THE VILLAS" title="それぞれの棟について。" />
+      </div>
+      <div class="stay__list">
+        {VILLAS.map((villa, index) => <VillaRow villa={villa} index={index} reversed={index % 2 === 1} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section on-forest" aria-labelledby="common-title">
+    <div class="shell stay__common">
+      <div>
+        <SectionHeading
+          id="common-title"
+          index="03"
+          label="ALL VILLAS"
+          title="3 棟に共通していること。"
+        />
+      </div>
+      <ul class="stay__common-list">
+        <li>
+          <span class="label">01 / PRIVACY</span>
+          <p>棟どうしは 80 メートル以上離れています。共用のラウンジ・浴場・サウナはありません。</p>
+        </li>
+        <li>
+          <span class="label">02 / SAUNA</span>
+          <p>全棟に専用サウナと外気浴スペース。15:00 – 24:00 と翌朝 6:00 – 10:00 に使えます。</p>
+        </li>
+        <li>
+          <span class="label">03 / BATH</span>
+          <p>露天風呂は掛け流し。地下水を加温した湯で、40 – 42℃ を想定しています。</p>
+        </li>
+        <li>
+          <span class="label">04 / AMENITY</span>
+          <p>寝具はリネンとウール。歯ブラシ・スキンケア・館内着・タオル 3 種を各棟に用意します。</p>
+        </li>
+        <li>
+          <span class="label">05 / KITCHEN</span>
+          <p>調理器具、食器、鉄瓶と急須。デッキには薪グリルがあります。</p>
+        </li>
+        <li>
+          <span class="label">06 / PARKING</span>
+          <p>各棟に専用駐車スペースを 2 台分。車を降りてから、他の宿泊者と会うことはありません。</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <FinalCta
+    eyebrow="RESERVE"
+    title="泊まる棟が決まったら。"
+    lead="日程と人数を入れると、3 棟の空き状況と料金の概算が出ます。"
+  />
+</Base>
+
+<style>
+  .stay__head {
+    margin-bottom: clamp(2rem, 4.5vw, 3.5rem);
+  }
+
+  .stay__list {
+    border-block-end: 1px solid var(--line);
+  }
+
+  .stay__common {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+
+  .stay__common-list {
+    display: grid;
+    gap: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .stay__common-list li {
+    display: grid;
+    gap: 0.5rem;
+    padding-block: clamp(1rem, 2.4vw, 1.5rem);
+    border-block-end: 1px solid var(--line);
+  }
+
+  .stay__common-list p {
+    color: var(--fg-muted);
+    font-size: var(--fs-small);
+    max-inline-size: 46em;
+  }
+
+  @media (min-width: 62em) {
+    .stay__common {
+      grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+      align-items: start;
+    }
+
+    .stay__common-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: clamp(2rem, 4vw, 3.5rem);
+    }
+  }
+</style>

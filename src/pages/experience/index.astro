@@ -1,0 +1,219 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Figure from '../../components/Figure.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import FinalCta from '../../components/FinalCta.astro';
+import { EXPERIENCES } from '../../data/experiences';
+
+const seasons = [
+  { season: '春', months: 'MAR – MAY', body: '山菜を摘んで、その日の夜の一品にします。ミツバツツジは 5 月のはじめ。' },
+  { season: '夏', months: 'JUN – AUG', body: '日没後の沢歩き。標高が高いので、夜はブランケットが要ります。' },
+  { season: '秋', months: 'SEP – NOV', body: '薪割りと、翌朝の火入れ。すすきは 10 月下旬から見頃です。' },
+  { season: '冬', months: 'DEC – FEB', body: '雪の日の外気浴。湯上がりに甘酒をお持ちします。' },
+];
+---
+
+<Base
+  title="EXPERIENCE / 滞在"
+  description="月替わりの夕食、土鍋の朝食、日没後の焚き火、朝の森の散歩。EMBER & MOSS の滞在中に選べる過ごし方をご紹介します。"
+>
+  <PageHero
+    label="EXPERIENCE"
+    title="することは、多くありません。"
+    lead="体験を並べるより、ひとつひとつに時間を割けるようにしました。予定を詰めない滞在のための構成です。"
+    image="dinner"
+    objectPosition="center 50%"
+  />
+
+  <div class="exp-page">
+    {
+      EXPERIENCES.map((experience, index) => (
+        <section
+          class:list={[
+            'exp-page__item section',
+            index % 2 === 0 ? 'on-light' : 'on-stone',
+            index % 2 === 1 && 'exp-page__item--reversed',
+          ]}
+          aria-labelledby={`exp-${experience.id}`}
+        >
+          <div class="shell exp-page__grid">
+            <div class="exp-page__media">
+              <Figure
+                id={experience.image.id}
+                alt={experience.image.alt}
+                sizes="(max-width: 61.99em) 100vw, 50vw"
+                ratio="4 / 3"
+              />
+            </div>
+
+            <div class="exp-page__text">
+              <p class="exp-page__meta">
+                <span class="num exp-page__no">{String(index + 1).padStart(2, '0')}</span>
+                <span class="label">{experience.label}</span>
+                <span class="exp-page__time num">{experience.time}</span>
+              </p>
+
+              <h2 class="exp-page__title font-mincho h2" id={`exp-${experience.id}`}>
+                {experience.lead}
+              </h2>
+
+              {experience.body.map((paragraph) => (
+                <p class="body">{paragraph}</p>
+              ))}
+
+              <dl class="exp-page__detail">
+                {experience.detail.map((detail) => (
+                  <div>
+                    <dt class="label">{detail.label}</dt>
+                    <dd>{detail.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        </section>
+      ))
+    }
+  </div>
+
+  <section class="section on-forest" aria-labelledby="season-title">
+    <div class="shell">
+      <div class="exp-page__head">
+        <SectionHeading
+          id="season-title"
+          index="06"
+          label="SEASON"
+          title="季節ごとに、ひとつだけ。"
+          lead="数を増やさず、その時期にしかできないことを用意します。ご予約時にお伝えください。"
+        />
+      </div>
+
+      <ul class="exp-page__seasons">
+        {
+          seasons.map((item, index) => (
+            <li data-reveal style={`--reveal-delay:${index * 80}ms`}>
+              <p class="exp-page__season font-mincho">{item.season}</p>
+              <p class="label">{item.months}</p>
+              <p class="small">{item.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <FinalCta
+    eyebrow="PLAN YOUR STAY"
+    title="食事は、予約時に選べます。"
+    lead="夕食・朝食の有無は、料金シミュレーターでその場で切り替えて確認できます。"
+  />
+</Base>
+
+<style>
+  .exp-page__grid {
+    display: grid;
+    gap: clamp(1.75rem, 4vw, 3rem);
+    align-items: center;
+  }
+
+  .exp-page__text {
+    display: grid;
+    gap: var(--sp-m);
+  }
+
+  .exp-page__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.9rem;
+  }
+
+  .exp-page__no {
+    font-size: var(--fs-label);
+    letter-spacing: 0.2em;
+    color: var(--accent);
+  }
+
+  .exp-page__time {
+    font-size: var(--fs-label);
+    letter-spacing: 0.12em;
+    color: var(--fg-faint);
+  }
+
+  .exp-page__title {
+    letter-spacing: 0.06em;
+  }
+
+  .exp-page__detail {
+    display: grid;
+    margin: 0;
+    border-block-start: 1px solid var(--line);
+    max-inline-size: 34em;
+  }
+
+  .exp-page__detail div {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr;
+    gap: var(--sp-s);
+    padding-block: 0.7rem;
+    border-block-end: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+
+  .exp-page__detail dd {
+    margin: 0;
+  }
+
+  .exp-page__head {
+    margin-bottom: clamp(2rem, 4.5vw, 3.5rem);
+  }
+
+  .exp-page__seasons {
+    display: grid;
+    gap: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .exp-page__seasons li {
+    display: grid;
+    gap: 0.5rem;
+    padding-block: clamp(1.1rem, 2.5vw, 1.75rem);
+    border-block-end: 1px solid var(--line);
+  }
+
+  .exp-page__season {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    letter-spacing: 0.2em;
+  }
+
+  .exp-page__seasons p:last-child {
+    color: var(--fg-muted);
+    max-inline-size: 36em;
+  }
+
+  @media (min-width: 62em) {
+    .exp-page__grid {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+    }
+
+    .exp-page__item--reversed .exp-page__media {
+      order: 2;
+    }
+
+    .exp-page__seasons {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      column-gap: clamp(1.5rem, 3vw, 3rem);
+    }
+
+    .exp-page__seasons li {
+      border-inline-end: 1px solid var(--line);
+      padding-inline-end: var(--sp-m);
+    }
+
+    .exp-page__seasons li:last-child {
+      border-inline-end: none;
+    }
+  }
+</style>

@@ -1,0 +1,117 @@
+---
+import Base from '../layouts/Base.astro';
+import { NAV } from '../data/site';
+---
+
+<Base
+  title="404 / ページが見つかりません"
+  description="お探しのページは見つかりませんでした。EMBER & MOSS のトップページ、または各ページからお探しください。"
+  showBookingBar={false}
+>
+  <section class="nf" aria-labelledby="nf-title">
+    <div class="shell nf__inner">
+      <p class="nf__code num">404</p>
+      <h1 class="nf__title font-mincho" id="nf-title">道を、少し外れたようです。</h1>
+      <p class="nf__lead lead">
+        お探しのページは見つかりませんでした。アドレスが変わったか、削除された可能性があります。
+      </p>
+
+      <ul class="nf__links">
+        <li>
+          <a href="/">
+            <span class="font-en">HOME</span>
+            <span class="nf__link-ja">トップページ</span>
+          </a>
+        </li>
+        {
+          NAV.map((item) => (
+            <li>
+              <a href={item.href}>
+                <span class="font-en">{item.label}</span>
+                <span class="nf__link-ja">{item.labelJa}</span>
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href="/booking/">
+            <span class="font-en">BOOKING</span>
+            <span class="nf__link-ja">空室・料金</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    display: grid;
+    align-items: center;
+    min-block-size: 100svh;
+    padding-block: calc(var(--header-h) + 3rem) clamp(3rem, 8vw, 6rem);
+    background:
+      radial-gradient(60% 50% at 78% 18%, rgba(184, 118, 67, 0.14), transparent 62%),
+      var(--c-obsidian);
+  }
+
+  /* サイト全体と同じ左揃えのグリッドに合わせる */
+  .nf__inner {
+    display: grid;
+    gap: var(--sp-m);
+    justify-items: start;
+  }
+
+  .nf__inner > * {
+    max-inline-size: 46rem;
+    inline-size: 100%;
+  }
+
+  .nf__code {
+    font-size: clamp(3rem, 12vw, 6rem);
+    line-height: 1;
+    color: var(--c-ember);
+    letter-spacing: 0.06em;
+  }
+
+  .nf__title {
+    font-size: clamp(1.75rem, 5.5vw, 3rem);
+    line-height: 1.35;
+    letter-spacing: 0.06em;
+  }
+
+  .nf__lead {
+    color: var(--fg-muted);
+  }
+
+  .nf__links {
+    display: grid;
+    margin-top: var(--sp-m);
+    border-block-start: 1px solid var(--line);
+    max-inline-size: 34rem;
+  }
+
+  .nf__links a {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-s);
+    padding-block: 1rem;
+    border-block-end: 1px solid var(--line);
+    min-block-size: var(--tap-min);
+    letter-spacing: 0.16em;
+    font-size: var(--fs-small);
+    transition: color var(--dur-fast) var(--ease-out), padding-inline-start var(--dur-base) var(--ease-out);
+  }
+
+  .nf__links a:hover {
+    color: var(--c-ember-bright);
+    padding-inline-start: 0.5rem;
+  }
+
+  .nf__link-ja {
+    font-size: 0.6875rem;
+    color: var(--fg-faint);
+    letter-spacing: 0.1em;
+  }
+</style>

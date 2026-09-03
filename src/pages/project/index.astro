@@ -1,0 +1,308 @@
+---
+import Base from '../../layouts/Base.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import FinalCta from '../../components/FinalCta.astro';
+import { SITE } from '../../data/site';
+
+const roles = ['Direction', 'Information Architecture', 'UI / UX Design', 'Art Direction', 'Copywriting', 'Frontend Development', 'Interaction Design'];
+
+const decisions = [
+  {
+    no: '01',
+    title: '「泊まりたい」から「予約」までを 1 本の線にした',
+    body: 'TOP の途中に料金シミュレーターを置き、入力した条件を URL と localStorage で BOOKING ページへ引き継ぎます。価格の不安を、離脱ではなくその場の操作で解消させる設計です。',
+  },
+  {
+    no: '02',
+    title: '空室状況まで含めて「予約できる」体験にした',
+    body: '日付を選ぶと 3 棟の空室状況が変わり、満室の棟は選択できなくなります。データは日付から決定的に生成した架空のもので、実在の在庫ではありませんが、予約エンジンとしての手ざわりを検証できるようにしています。',
+  },
+  {
+    no: '03',
+    title: 'スマホを主画面として設計した',
+    body: '検討はスマホ、比較はデスクトップという前提で、画面下部の固定 CTA、44px 以上のタップ領域、横スクロールの比較表、ステップ形式の予約 UI を用意しています。',
+  },
+  {
+    no: '04',
+    title: '写真が主役でも速度を落とさない',
+    body: 'AVIF / WebP の自動生成、srcset と sizes の指定、LCP 画像のみ eager 読み込み。日本語フォントはサイト内で使う文字だけにサブセット化し、フルセット 3.2MB を約 375KB（約 1/8）に抑えています。',
+  },
+  {
+    no: '05',
+    title: '架空であることを隠さない',
+    body: '実在の施設と誤認されないよう、TOP・フッター・予約完了画面にコンセプトプロジェクトである旨を明記しています。存在しない受賞歴や利用者数は掲載していません。',
+  },
+];
+
+const stack = [
+  { label: 'Framework', value: 'Astro（静的出力）' },
+  { label: 'Language', value: 'TypeScript（strict）' },
+  { label: 'Styling', value: 'CSS カスタムプロパティによる自作デザインシステム' },
+  { label: 'JavaScript', value: '約 13〜16KB（gzip）/ UI ライブラリ・アニメーションライブラリなし' },
+  { label: 'Images', value: 'astro:assets による AVIF / WebP 生成' },
+  { label: 'Fonts', value: 'Jost / Zen Kaku Gothic New / しっぽり明朝（サブセット自己ホスト）' },
+  { label: 'Testing', value: 'Vitest（料金ロジック）/ Playwright（表示・横スクロール検証）' },
+  { label: 'Hosting', value: 'Cloudflare Pages などの静的ホスティングを想定' },
+];
+---
+
+<Base
+  title="ABOUT THIS PROJECT / この制作について"
+  description="EMBER & MOSS は実在しない宿泊施設です。Web サイトの設計・デザイン・実装力を示すために制作した自主制作（コンセプトプロジェクト）の背景と設計意図をまとめています。"
+>
+  <section class="phead" aria-labelledby="project-title">
+    <div class="shell phead__inner">
+      <nav class="phead__crumb" aria-label="パンくずリスト">
+        <ol>
+          <li><a href="/">HOME</a></li>
+          <li aria-current="page">ABOUT THIS PROJECT</li>
+        </ol>
+      </nav>
+      <p class="label label--accent">{SITE.conceptNotice.label}</p>
+      <h1 class="phead__title font-mincho" id="project-title">この宿は、存在しません。</h1>
+      <p class="phead__lead lead">{SITE.conceptNotice.long}</p>
+    </div>
+  </section>
+
+  <section class="section on-light" aria-labelledby="why-title">
+    <div class="shell project__grid">
+      <div>
+        <SectionHeading
+          id="why-title"
+          index="01"
+          label="BACKGROUND"
+          title="なぜ架空の宿をつくったか。"
+        />
+        <p class="body">
+          宿泊施設の Web サイトは、写真の力に頼るだけでは成立しません。部屋を比較でき、料金の見通しが立ち、スマートフォンで予約まで進める。その一連の流れを設計できるかどうかが、実際の受注では問われます。
+        </p>
+        <p class="body">
+          実在の施設を題材にすると、掲載できる情報や表現に制約が出ます。そこで、条件をこちらで定義できる架空のブランドを立て、情報設計からコピー、実装、検証までを通しで行いました。
+        </p>
+      </div>
+
+      <dl class="project__roles">
+        <dt class="label">ROLE</dt>
+        <dd>
+          <ul>
+            {roles.map((role) => <li>{role}</li>)}
+          </ul>
+        </dd>
+        <dt class="label">TYPE</dt>
+        <dd>Self-initiated concept project</dd>
+        <dt class="label">CATEGORY</dt>
+        <dd>Luxury Villa / Hospitality</dd>
+        <dt class="label">PAGES</dt>
+        <dd>TOP / STAY（一覧・詳細 3 棟）/ SAUNA / EXPERIENCE / ACCESS &amp; FAQ / BOOKING / 404</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section on-stone" aria-labelledby="decision-title">
+    <div class="shell">
+      <div class="project__head">
+        <SectionHeading
+          id="decision-title"
+          index="02"
+          label="DESIGN DECISIONS"
+          title="設計で決めたこと。"
+        />
+      </div>
+      <ol class="project__decisions">
+        {
+          decisions.map((decision) => (
+            <li data-reveal>
+              <span class="num project__no">{decision.no}</span>
+              <h3 class="project__decision-title">{decision.title}</h3>
+              <p class="small">{decision.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section on-forest" aria-labelledby="stack-title">
+    <div class="shell project__grid">
+      <div>
+        <SectionHeading id="stack-title" index="03" label="TECH" title="使っている技術。" />
+        <p class="body">
+          派手さより、更新しやすさと表示速度を優先しています。アニメーションのためだけのライブラリは入れていません。
+        </p>
+        <p class="body project__note">
+          写真は AI 生成画像への差し替えを前提に設計しています。現在表示されているのは、比率とトーンを合わせた仮画像です。差し替え手順とプロンプトはリポジトリの docs にまとめています。
+        </p>
+      </div>
+
+      <dl class="project__stack">
+        {
+          stack.map((item) => (
+            <div>
+              <dt class="label">{item.label}</dt>
+              <dd>{item.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <FinalCta
+    eyebrow="TRY THE FLOW"
+    title="予約 UI を触ってみてください。"
+    lead="日程と人数を入れると料金が変わります。送信は行われません。"
+  />
+</Base>
+
+<style>
+  .phead {
+    padding-block: calc(var(--header-h) + clamp(3rem, 8vw, 5rem)) clamp(2.5rem, 6vw, 4rem);
+    background:
+      radial-gradient(70% 60% at 85% 0%, rgba(184, 118, 67, 0.12), transparent 62%),
+      var(--c-obsidian);
+    border-block-end: 1px solid var(--line);
+  }
+
+  .phead__inner {
+    display: grid;
+    gap: var(--sp-m);
+    max-inline-size: 54rem;
+  }
+
+  .phead__crumb ol {
+    display: flex;
+    gap: 0.55rem;
+    font-family: var(--font-en);
+    font-size: var(--fs-label);
+    letter-spacing: 0.16em;
+    color: var(--fg-faint);
+  }
+
+  .phead__crumb a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
+  }
+
+  .phead__crumb li {
+    display: flex;
+    align-items: center;
+  }
+
+  .phead__crumb li + li::before {
+    content: '/';
+    margin-inline-end: 0.55rem;
+    opacity: 0.5;
+  }
+
+  .phead__title {
+    font-size: clamp(2rem, 6.5vw, 3.75rem);
+    line-height: 1.28;
+    letter-spacing: 0.06em;
+  }
+
+  .phead__lead {
+    color: var(--fg-muted);
+  }
+
+  .project__grid {
+    display: grid;
+    gap: clamp(2rem, 5vw, 3.5rem);
+    align-items: start;
+  }
+
+  .project__grid p.body {
+    margin-top: var(--sp-m);
+  }
+
+  .project__note {
+    padding-inline-start: 1rem;
+    border-inline-start: 1px solid var(--accent);
+  }
+
+  .project__roles,
+  .project__stack {
+    display: grid;
+    margin: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .project__roles dt,
+  .project__roles dd {
+    padding-block: 0.85rem;
+    border-block-end: 1px solid var(--line);
+    margin: 0;
+    font-size: var(--fs-small);
+  }
+
+  .project__roles dt {
+    color: var(--fg-faint);
+    padding-block-end: 0.35rem;
+    border-block-end: none;
+  }
+
+  .project__roles ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+  }
+
+  .project__stack div {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: var(--sp-s);
+    padding-block: 0.85rem;
+    border-block-end: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+
+  .project__stack dd {
+    margin: 0;
+  }
+
+  .project__head {
+    margin-bottom: clamp(2rem, 4.5vw, 3.5rem);
+  }
+
+  .project__decisions {
+    display: grid;
+    gap: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .project__decisions li {
+    display: grid;
+    gap: 0.5rem;
+    padding-block: clamp(1.25rem, 3vw, 2rem);
+    border-block-end: 1px solid var(--line);
+  }
+
+  .project__no {
+    font-size: var(--fs-label);
+    letter-spacing: 0.2em;
+    color: var(--accent);
+  }
+
+  .project__decision-title {
+    font-size: var(--fs-lead);
+    letter-spacing: 0.05em;
+    line-height: 1.6;
+  }
+
+  .project__decisions p {
+    color: var(--fg-muted);
+    max-inline-size: 48em;
+  }
+
+  @media (min-width: 62em) {
+    .project__grid {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+    }
+
+    .project__decisions {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: clamp(2.5rem, 5vw, 4rem);
+    }
+  }
+</style>

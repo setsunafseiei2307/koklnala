@@ -1,0 +1,47 @@
+---
+import SectionHeading from '../SectionHeading.astro';
+import VillaRow from '../VillaRow.astro';
+import { VILLAS } from '../../data/villas';
+---
+
+<section class="section on-stone" id="stay" aria-labelledby="stay-title">
+  <div class="shell">
+    <div class="stay__heading">
+      <SectionHeading
+      id="stay-title"
+      index="02"
+      label="STAY"
+      title="3 棟。どれも、違う森を見ている。"
+      lead="同じ敷地に建てながら、向きも素材も高さも変えました。選ぶというより、その日の気分に近いほうを選んでください。"
+      />
+    </div>
+
+    <div class="stay__list">
+      {VILLAS.map((villa, index) => <VillaRow villa={villa} index={index} reversed={index % 2 === 1} />)}
+    </div>
+
+    <div class="stay__foot">
+      <a class="btn btn--solid" href="/stay/"><span class="btn__label">3 棟をくらべて見る</span></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .stay__heading {
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .stay__list {
+    border-block-end: 1px solid var(--line);
+  }
+
+  .stay__foot {
+    display: flex;
+    justify-content: center;
+    padding-block-start: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .stay__foot .btn {
+    inline-size: min(100%, 22rem);
+  }
+</style>

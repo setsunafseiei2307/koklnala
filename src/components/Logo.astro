@@ -1,0 +1,46 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' }: Props = Astro.props;
+---
+
+<span class:list={['logo', className]}>
+  <span class="logo__mark" aria-hidden="true"></span>
+  <span class="logo__text">EMBER<span class="logo__amp">&amp;</span>MOSS</span>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7em;
+    font-family: var(--font-en);
+    font-size: var(--logo-size, 0.9375rem);
+    font-weight: 400;
+    letter-spacing: 0.24em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* 熾火のマーク。輪郭は焼き杉の色 */
+  .logo__mark {
+    inline-size: 0.5em;
+    block-size: 0.5em;
+    border-radius: 50%;
+    background: var(--c-ember);
+    box-shadow: 0 0 0 0.28em rgba(184, 118, 67, 0.16);
+    flex: none;
+    translate: 0 -0.02em;
+  }
+
+  .logo__amp {
+    font-family: var(--font-mincho);
+    font-size: 0.86em;
+    padding-inline: 0.42em;
+    opacity: 0.62;
+    letter-spacing: 0;
+  }
+</style>

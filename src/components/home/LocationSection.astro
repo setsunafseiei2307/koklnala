@@ -1,0 +1,141 @@
+---
+import Figure from '../Figure.astro';
+import { ACCESS_ROUTES } from '../../data/access';
+
+const car = ACCESS_ROUTES[0]!;
+---
+
+<section class="loc section on-forest" id="location" aria-labelledby="loc-title">
+  <div class="shell loc__grid">
+    <div class="loc__text">
+      <p class="loc__meta"><span class="num loc__index">06</span><span class="label">LOCATION</span></p>
+      <h2 class="loc__title font-mincho h1" id="loc-title" data-reveal>
+        東京から、<br />およそ 90 分。
+      </h2>
+      <p class="body loc__body" data-reveal style="--reveal-delay:100ms">
+        御殿場インターを降りて、国道 138 号を仙石原へ。標高が 700 メートルを超えるあたりから、空気の温度が一段下がります。最後の林道は 5 分ほどです。
+      </p>
+
+      <ol class="loc__route" aria-label="車での経路">
+        {
+          car.steps.map((step, index) => (
+            <li class="loc__step" data-reveal style={`--reveal-delay:${index * 70}ms`}>
+              <span class="loc__dot" aria-hidden="true"></span>
+              <span class="loc__place">{step.place}</span>
+              <span class="loc__note small">{step.note}</span>
+            </li>
+          ))
+        }
+      </ol>
+
+      <p class="loc__caution small">
+        実在の施設ではないため、正確な住所は掲載していません。箱根・仙石原エリアを想定したコンセプト施設です。
+      </p>
+
+      <a class="link loc__link" href="/access/">
+        <span>アクセスと FAQ</span>
+        <span class="link__arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+
+    <div class="loc__media">
+      <Figure id="forest-morning" sizes="(max-width: 61.99em) 100vw, 42vw" ratio="3 / 4" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .loc__grid {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .loc__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: var(--sp-m);
+  }
+
+  .loc__index {
+    font-size: var(--fs-label);
+    letter-spacing: 0.2em;
+    color: var(--accent);
+  }
+
+  .loc__title {
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+  }
+
+  .loc__body {
+    margin-top: var(--sp-l);
+  }
+
+  .loc__route {
+    margin-top: clamp(2rem, 4vw, 3rem);
+    display: grid;
+    gap: 0;
+  }
+
+  .loc__step {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--sp-m);
+    padding-block: 0.9rem;
+    align-items: baseline;
+  }
+
+  /* 経路を結ぶ縦線 */
+  .loc__step::before {
+    content: '';
+    position: absolute;
+    inset-block: 1.4rem -0.4rem;
+    inset-inline-start: 3px;
+    inline-size: 1px;
+    background: var(--line-strong);
+  }
+
+  .loc__step:last-child::before {
+    display: none;
+  }
+
+  .loc__dot {
+    inline-size: 7px;
+    block-size: 7px;
+    border-radius: 50%;
+    background: var(--c-ember);
+    translate: 0 -0.25em;
+  }
+
+  .loc__place {
+    font-size: var(--fs-lead);
+    letter-spacing: 0.08em;
+  }
+
+  .loc__note {
+    grid-column: 2;
+    color: var(--fg-muted);
+  }
+
+  .loc__caution {
+    margin-top: var(--sp-m);
+    padding-inline-start: 0.9rem;
+    border-inline-start: 1px solid var(--line-strong);
+    color: var(--fg-faint);
+    max-inline-size: 34em;
+  }
+
+  .loc__link {
+    margin-top: var(--sp-l);
+  }
+
+  @media (min-width: 62em) {
+    .loc__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+      align-items: center;
+    }
+  }
+</style>

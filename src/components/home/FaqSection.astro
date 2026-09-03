@@ -1,0 +1,51 @@
+---
+import Faq from '../Faq.astro';
+import SectionHeading from '../SectionHeading.astro';
+import { FAQ_GROUPS } from '../../data/faq';
+
+/** TOP では各カテゴリの先頭 2 件のみ。全文は ACCESS ページ */
+const groups = FAQ_GROUPS.filter((group) => group.id !== 'access');
+---
+
+<section class="faqs section on-light" id="faq" aria-labelledby="faqs-title">
+  <div class="shell faqs__grid">
+    <div class="faqs__head">
+      <SectionHeading id="faqs-title" index="08" label="FAQ" title="泊まる前に、よくいただく質問。" />
+      <a class="link faqs__link" href="/access/#faq">
+        <span>すべての質問を見る</span>
+        <span class="link__arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+    <Faq groups={groups} showGroupLabels={false} limitPerGroup={2} />
+  </div>
+</section>
+
+<style>
+  .faqs__grid {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .faqs__head {
+    display: grid;
+    gap: var(--sp-l);
+    align-content: start;
+  }
+
+  .faqs__link {
+    justify-self: start;
+  }
+
+  @media (min-width: 62em) {
+    .faqs__grid {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+      align-items: start;
+    }
+
+    .faqs__head {
+      position: sticky;
+      top: calc(var(--header-h) + 2.5rem);
+    }
+  }
+</style>

@@ -1,0 +1,126 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import MobileBookingBar from '../components/MobileBookingBar.astro';
+import { SITE } from '../data/site';
+
+interface Props {
+  /** 「◯◯ | EMBER & MOSS」の左側。TOP のみ空 */
+  title: string;
+  description: string;
+  /** OGP 用の画像パス（/images/ 以下の公開ファイル） */
+  ogImage?: string;
+  /** モバイル下部の固定 CTA を出すか（予約ページでは不要） */
+  showBookingBar?: boolean;
+  bodyClass?: string;
+}
+
+const {
+  title,
+  description,
+  ogImage = '/og-image.jpg',
+  showBookingBar = true,
+  bodyClass = '',
+} = Astro.props;
+
+const fullTitle = title ? `${title}｜${SITE.brand}` : `${SITE.brand}｜${SITE.tagline}`;
+const path = Astro.url.pathname;
+// 公開ドメイン未確定のため、site 未設定時は絶対 URL を作らない（架空の URL を出さない）
+const canonical = Astro.site ? new URL(path, Astro.site).href : undefined;
+const ogImageUrl = Astro.site ? new URL(ogImage, Astro.site).href : ogImage;
+
+/** 実在の宿泊施設としてではなく「自主制作の作品」として記述する */
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: `${SITE.brand} — Concept Website`,
+  headline: fullTitle,
+  description: SITE.conceptNotice.long,
+  inLanguage: 'ja',
+  genre: 'Web Design / Concept Project',
+  abstract: SITE.description,
+};
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+
+    <meta name="theme-color" content="#0C0E0D" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.brand} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:locale" content="ja_JP" />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- 本文と見出しに使う 2 書体のみ先読みする -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/zen-kaku-gothic-new-400.woff2"
+      crossorigin
+    />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/jost-latin-variable.woff2" crossorigin />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+
+    <!-- ページ間をフェードでつなぐ（prefers-reduced-motion 時は無効化） -->
+    <ClientRouter />
+
+    <!-- JS 有効時のみ出現アニメーションの初期状態を適用する -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+
+  <body class={bodyClass}>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    {showBookingBar && <MobileBookingBar />}
+
+    <script>
+      import { initReveal } from '../scripts/reveal';
+
+      document.addEventListener('astro:page-load', initReveal);
+    </script>
+
+    <style is:global>
+      /* メニュー展開中の背面スクロールを止める */
+      html.is-locked {
+        overflow: hidden;
+      }
+
+      /* モバイル固定 CTA と重ならないよう、フッター下に余白を確保する */
+      @media (max-width: 61.99em) {
+        body:has([data-booking-bar]) {
+          padding-bottom: 4.5rem;
+        }
+      }
+    </style>
+  </body>
+</html>

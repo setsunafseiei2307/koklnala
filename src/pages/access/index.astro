@@ -1,0 +1,312 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import Faq from '../../components/Faq.astro';
+import FinalCta from '../../components/FinalCta.astro';
+import { ACCESS_ROUTES, AREA_NOTES, NEARBY } from '../../data/access';
+import { FAQ_GROUPS } from '../../data/faq';
+import { SITE } from '../../data/site';
+---
+
+<Base
+  title="ACCESS & FAQ / アクセス"
+  description="東京から車でおよそ 90 分、小田原駅から送迎で約 50 分。箱根・仙石原エリアを想定した EMBER & MOSS への行き方と、宿泊前によくいただく質問をまとめました。"
+>
+  <PageHero
+    label="ACCESS & FAQ"
+    title="東京から、およそ 90 分。"
+    lead="御殿場インターを降りて、仙石原へ。標高 700 メートルを超えるあたりから、空気の温度が変わります。"
+    image="forest-morning"
+    objectPosition="center 40%"
+  />
+
+  <section class="section on-light" aria-labelledby="route-title">
+    <div class="shell">
+      <div class="access__head">
+        <SectionHeading
+          id="route-title"
+          index="01"
+          label="ROUTE"
+          title="行き方は 2 通り。"
+          lead="車の場合は各棟の専用駐車場まで、電車の場合は小田原駅からの送迎をご利用いただけます。"
+        />
+      </div>
+
+      <div class="access__routes">
+        {
+          ACCESS_ROUTES.map((route) => (
+            <article class="access__route" data-reveal>
+              <header class="access__route-head">
+                <p class="label label--accent">{route.label}</p>
+                <h3 class="access__route-title">{route.labelJa}</h3>
+                <p class="access__route-time num">{route.duration}</p>
+              </header>
+
+              <ol class="access__steps">
+                {route.steps.map((step) => (
+                  <li>
+                    <span class="access__dot" aria-hidden="true" />
+                    <span class="access__place">{step.place}</span>
+                    <span class="access__note small">{step.note}</span>
+                  </li>
+                ))}
+              </ol>
+
+              <p class="access__caution small">{route.note}</p>
+            </article>
+          ))
+        }
+      </div>
+
+      <p class="access__disclaimer small">
+        <span class="label label--accent">{SITE.conceptNotice.label}</span>
+        EMBER &amp; MOSS は実在しない施設のため、正確な住所と地図は掲載していません。所要時間は箱根・仙石原エリアを想定した目安です。
+      </p>
+    </div>
+  </section>
+
+  <section class="section on-stone" aria-labelledby="area-title">
+    <div class="shell access__area">
+      <div>
+        <SectionHeading id="area-title" index="02" label="THE AREA" title="宿の基本情報。" />
+        <dl class="access__info">
+          {
+            AREA_NOTES.map((note) => (
+              <div>
+                <dt class="label">{note.label}</dt>
+                <dd>{note.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+
+      <div>
+        <h3 class="access__nearby-title label">まわりにあるもの</h3>
+        <ul class="access__nearby">
+          {
+            NEARBY.map((place) => (
+              <li>
+                <span class="access__nearby-name">{place.name}</span>
+                <span class="access__nearby-distance num">{place.distance}</span>
+                <span class="access__nearby-note small">{place.note}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section on-light" id="faq" aria-labelledby="faq-title">
+    <div class="shell access__faq">
+      <div class="access__faq-head">
+        <SectionHeading
+          id="faq-title"
+          index="03"
+          label="FAQ"
+          title="よくいただく質問。"
+          lead="ここにない内容は、メールでお問い合わせください（コンセプトプロジェクトのため返信は行われません）。"
+        />
+        <p class="access__faq-mail small font-en">{SITE.contactEmail}</p>
+      </div>
+      <Faq groups={FAQ_GROUPS} />
+    </div>
+  </section>
+
+  <FinalCta />
+</Base>
+
+<style>
+  .access__head {
+    margin-bottom: clamp(2rem, 4.5vw, 3.5rem);
+  }
+
+  .access__routes {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .access__route {
+    display: grid;
+    gap: var(--sp-m);
+    align-content: start;
+    padding-block-start: var(--sp-m);
+    border-block-start: 1px solid var(--line-strong);
+  }
+
+  .access__route-head {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .access__route-title {
+    font-size: var(--fs-h3);
+    letter-spacing: 0.08em;
+  }
+
+  .access__route-time {
+    color: var(--accent);
+    letter-spacing: 0.06em;
+  }
+
+  .access__steps {
+    display: grid;
+  }
+
+  .access__steps li {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--sp-m);
+    padding-block: 0.85rem;
+    align-items: baseline;
+  }
+
+  .access__steps li::before {
+    content: '';
+    position: absolute;
+    inset-block: 1.35rem -0.35rem;
+    inset-inline-start: 3px;
+    inline-size: 1px;
+    background: var(--line-strong);
+  }
+
+  .access__steps li:last-child::before {
+    display: none;
+  }
+
+  .access__dot {
+    inline-size: 7px;
+    block-size: 7px;
+    border-radius: 50%;
+    background: var(--c-ember);
+    translate: 0 -0.25em;
+  }
+
+  .access__place {
+    letter-spacing: 0.08em;
+  }
+
+  .access__note {
+    grid-column: 2;
+    color: var(--fg-muted);
+  }
+
+  .access__caution {
+    color: var(--fg-faint);
+    padding-inline-start: 0.9rem;
+    border-inline-start: 1px solid var(--line-strong);
+  }
+
+  .access__disclaimer {
+    display: grid;
+    gap: 0.4rem;
+    margin-top: clamp(2rem, 4vw, 3rem);
+    padding: var(--sp-m);
+    border: 1px solid var(--line);
+    color: var(--fg-muted);
+    max-inline-size: 52em;
+  }
+
+  .access__area {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .access__info {
+    display: grid;
+    margin: var(--sp-l) 0 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .access__info div {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: var(--sp-s);
+    padding-block: 0.85rem;
+    border-block-end: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+
+  .access__info dd {
+    margin: 0;
+  }
+
+  .access__nearby-title {
+    color: var(--fg-faint);
+  }
+
+  .access__nearby {
+    display: grid;
+    margin-top: var(--sp-s);
+    border-block-start: 1px solid var(--line);
+  }
+
+  .access__nearby li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.3rem var(--sp-s);
+    padding-block: 0.9rem;
+    border-block-end: 1px solid var(--line);
+  }
+
+  .access__nearby-name {
+    font-size: var(--fs-small);
+    letter-spacing: 0.06em;
+  }
+
+  .access__nearby-distance {
+    font-size: var(--fs-small);
+    color: var(--accent);
+  }
+
+  .access__nearby-note {
+    grid-column: 1 / -1;
+    color: var(--fg-faint);
+  }
+
+  .access__faq {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .access__faq-head {
+    display: grid;
+    gap: var(--sp-m);
+    align-content: start;
+  }
+
+  .access__faq-mail {
+    color: var(--fg-faint);
+    letter-spacing: 0.06em;
+    word-break: break-all;
+  }
+
+  @media (min-width: 48em) {
+    .access__routes {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: clamp(2.5rem, 5vw, 4.5rem);
+    }
+  }
+
+  @media (min-width: 62em) {
+    .access__faq {
+      grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+      align-items: start;
+    }
+
+    .access__faq-head {
+      position: sticky;
+      top: calc(var(--header-h) + 2.5rem);
+    }
+
+    .access__area {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      column-gap: clamp(3rem, 6vw, 6rem);
+      align-items: start;
+    }
+  }
+</style>

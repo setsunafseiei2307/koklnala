@@ -1,0 +1,112 @@
+---
+import { VILLA_BASE_RATE } from '../data/pricing';
+
+const from = Math.min(...Object.values(VILLA_BASE_RATE)).toLocaleString('ja-JP');
+---
+
+<div class="bar" data-booking-bar aria-hidden="false">
+  <div class="bar__price">
+    <span class="label">1 泊 2 名</span>
+    <span class="bar__amount num">¥{from}<span class="bar__from">〜</span></span>
+  </div>
+  <a class="bar__cta" href="/booking/">
+    <span>料金・空室を見る</span>
+  </a>
+</div>
+
+<script>
+  // ヒーローを抜けたところで現れる。スクロール量のみで判定する。
+  const initBookingBar = () => {
+    const bar = document.querySelector<HTMLElement>('[data-booking-bar]');
+    if (!bar) return;
+    let ticking = false;
+    const update = () => {
+      bar.toggleAttribute('data-visible', window.scrollY > window.innerHeight * 0.7);
+      ticking = false;
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+      },
+      { passive: true },
+    );
+    update();
+  };
+
+  document.addEventListener('astro:page-load', initBookingBar);
+</script>
+
+<style>
+  .bar {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: var(--z-bar);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-s);
+    padding: 0.7rem var(--page-gutter);
+    padding-bottom: calc(0.7rem + env(safe-area-inset-bottom, 0px));
+    background: rgba(12, 14, 13, 0.94);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    translate: 0 110%;
+    transition: translate var(--dur-base) var(--ease-out);
+  }
+
+  .bar[data-visible] {
+    translate: 0 0;
+  }
+
+  .bar__price {
+    display: grid;
+    gap: 0.15rem;
+    color: var(--c-ivory);
+  }
+
+  .bar__amount {
+    font-size: 1.0625rem;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+  }
+
+  .bar__from {
+    font-size: 0.75rem;
+    color: var(--fg-muted);
+    margin-inline-start: 0.15em;
+  }
+
+  .bar__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--tap-min);
+    padding-inline: 1.4rem;
+    background: var(--c-ember-deep);
+    color: #fff;
+    font-size: var(--fs-small);
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+
+  .bar__cta:active {
+    background: var(--c-ember);
+  }
+
+  /* デスクトップではヘッダーの CTA があるため出さない */
+  @media (min-width: 62em) {
+    .bar {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bar {
+      transition: none;
+    }
+  }
+</style>

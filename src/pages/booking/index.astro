@@ -1,0 +1,159 @@
+---
+import Base from '../../layouts/Base.astro';
+import BookingStepper from '../../components/BookingStepper.astro';
+import { SITE } from '../../data/site';
+import { VILLA_BASE_RATE } from '../../data/pricing';
+
+const from = Math.min(...Object.values(VILLA_BASE_RATE)).toLocaleString('ja-JP');
+---
+
+<Base
+  title="BOOKING / 宿泊予約"
+  description="日程・人数・ヴィラ・食事を選ぶと、EMBER & MOSS の宿泊料金の概算がその場で表示されます。1 泊 2 名 68,000 円〜。架空施設のコンセプトサイトのため、実際の予約は送信されません。"
+  showBookingBar={false}
+>
+  <section class="bhead" aria-labelledby="booking-title">
+    <div class="shell bhead__inner">
+      <nav class="bhead__crumb" aria-label="パンくずリスト">
+        <ol>
+          <li><a href="/">HOME</a></li>
+          <li aria-current="page">BOOKING</li>
+        </ol>
+      </nav>
+
+      <p class="label label--accent">BOOKING</p>
+      <h1 class="bhead__title font-mincho" id="booking-title">空室と料金を確認する。</h1>
+      <p class="bhead__lead lead">
+        5 つのステップで、料金の概算まで進めます。入力内容はこの端末にのみ保存されます。
+      </p>
+
+      <dl class="bhead__facts">
+        <div><dt class="label">料金</dt><dd class="num">¥{from}〜 / 1 泊 2 名</dd></div>
+        <div><dt class="label">チェックイン</dt><dd class="num">{SITE.checkIn}</dd></div>
+        <div><dt class="label">チェックアウト</dt><dd class="num">{SITE.checkOut}</dd></div>
+        <div><dt class="label">棟数</dt><dd>{SITE.rooms}</dd></div>
+      </dl>
+
+      <p class="bhead__notice small">
+        <span class="label label--accent">{SITE.conceptNotice.label}</span>
+        <span>{SITE.conceptNotice.short}空室状況・料金はすべて架空の設定で、実際の予約・決済は行われません。</span>
+        <a class="bhead__notice-link" href="/project/">この制作について</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section bsec" aria-label="宿泊予約フォーム">
+    <div class="shell">
+      <BookingStepper />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .bhead {
+    padding-block: calc(var(--header-h) + clamp(2.5rem, 6vw, 4.5rem)) clamp(2rem, 5vw, 3.5rem);
+    background:
+      radial-gradient(80% 60% at 88% 0%, rgba(184, 118, 67, 0.13), transparent 60%),
+      var(--c-obsidian);
+    border-block-end: 1px solid var(--line);
+  }
+
+  .bhead__inner {
+    display: grid;
+    gap: var(--sp-m);
+    max-inline-size: 60rem;
+  }
+
+  .bhead__crumb ol {
+    display: flex;
+    gap: 0.55rem;
+    font-family: var(--font-en);
+    font-size: var(--fs-label);
+    letter-spacing: 0.16em;
+    color: var(--fg-faint);
+  }
+
+  .bhead__crumb li + li::before {
+    content: '/';
+    margin-inline-end: 0.55rem;
+    opacity: 0.5;
+  }
+
+  .bhead__crumb a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
+  }
+
+  .bhead__crumb li {
+    display: flex;
+    align-items: center;
+  }
+
+  .bhead__crumb a:hover {
+    color: var(--c-ember-bright);
+  }
+
+  .bhead__title {
+    font-size: clamp(2rem, 6.5vw, 3.5rem);
+    line-height: 1.28;
+    letter-spacing: 0.06em;
+  }
+
+  .bhead__lead {
+    color: var(--fg-muted);
+  }
+
+  .bhead__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: var(--sp-s) var(--sp-m);
+    margin: var(--sp-s) 0 0;
+    padding-block-start: var(--sp-m);
+    border-block-start: 1px solid var(--line);
+  }
+
+  .bhead__facts div {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .bhead__facts dd {
+    margin: 0;
+    font-size: var(--fs-small);
+  }
+
+  .bhead__notice-link {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
+    border-block-end: 1px solid var(--line-strong);
+    padding-block-end: 2px;
+    color: var(--fg-muted);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  .bhead__notice-link:hover {
+    color: var(--c-ember-bright);
+  }
+
+  .bhead__notice {
+    display: grid;
+    gap: 0.35rem;
+    color: var(--fg-faint);
+    max-inline-size: 52em;
+    line-height: 1.85;
+  }
+
+  .bsec {
+    padding-block: clamp(2.5rem, 5vw, 4rem) clamp(6rem, 10vw, 7rem);
+  }
+
+  /* モバイルは固定バーの高さぶん余白を確保する */
+  @media (max-width: 61.99em) {
+    .bsec {
+      padding-block-end: 7rem;
+    }
+  }
+</style>
