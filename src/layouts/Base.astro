@@ -57,6 +57,10 @@ const jsonLd = {
     <meta name="color-scheme" content="dark" />
     <meta name="format-detection" content="telephone=no" />
 
+    <!-- 配信中のビルドを特定するための情報（表示はされない） -->
+    <meta name="build-ref" content={__BUILD_REF__} />
+    <meta name="build-time" content={__BUILD_TIME__} />
+
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.brand} />
     <meta property="og:title" content={fullTitle} />
