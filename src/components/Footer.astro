@@ -36,16 +36,11 @@ const year = new Date().getFullYear();
       <div><dt>棟数</dt><dd>{SITE.rooms}</dd></div>
       <div><dt>チェックイン</dt><dd class="num">{SITE.checkIn}</dd></div>
       <div><dt>チェックアウト</dt><dd class="num">{SITE.checkOut}</dd></div>
-      <div><dt>お問い合わせ</dt><dd class="font-en footer__mail">{SITE.contactEmail}</dd></div>
     </dl>
   </div>
 
   <div class="shell footer__bottom">
-    <p class="footer__notice small">
-      <span>{SITE.conceptNotice.short}</span>
-      <a class="footer__notice-link" href="/project/">この制作について</a>
-    </p>
-    <p class="footer__copy small num">© {year} EMBER &amp; MOSS — Self-initiated concept project.</p>
+    <p class="footer__copy small num">© {year} EMBER &amp; MOSS.</p>
   </div>
 </footer>
 
@@ -142,40 +137,12 @@ const year = new Date().getFullYear();
     color: var(--fg-muted);
   }
 
-  .footer__mail {
-    letter-spacing: 0.04em;
-    word-break: break-all;
-  }
-
   .footer__bottom {
     display: grid;
     gap: var(--sp-m);
     padding-block: var(--sp-m) var(--sp-l);
     border-top: 1px solid var(--line);
     color: var(--fg-faint);
-  }
-
-  .footer__notice {
-    display: grid;
-    gap: 0.5rem;
-    max-width: 60ch;
-    font-size: var(--fs-small);
-    line-height: 1.85;
-  }
-
-  .footer__notice-link {
-    justify-self: start;
-    display: inline-flex;
-    align-items: center;
-    min-block-size: var(--tap-min);
-    border-bottom: 1px solid var(--line-strong);
-    padding-bottom: 2px;
-    color: var(--fg-muted);
-    transition: color var(--dur-fast) var(--ease-out);
-  }
-
-  .footer__notice-link:hover {
-    color: var(--c-ember-bright);
   }
 
   .footer__copy {
@@ -196,7 +163,6 @@ const year = new Date().getFullYear();
     }
 
     .footer__bottom {
-      grid-template-columns: 1fr auto;
       align-items: end;
     }
   }

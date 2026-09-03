@@ -6,7 +6,6 @@ import Faq from '../../components/Faq.astro';
 import FinalCta from '../../components/FinalCta.astro';
 import { ACCESS_ROUTES, AREA_NOTES, NEARBY } from '../../data/access';
 import { FAQ_GROUPS } from '../../data/faq';
-import { SITE } from '../../data/site';
 ---
 
 <Base
@@ -106,9 +105,8 @@ import { SITE } from '../../data/site';
           index="03"
           label="FAQ"
           title="よくいただく質問。"
-          lead="ここにない内容は、メールでお問い合わせください。"
+          lead="ここにない内容は、ご予約時の備考欄からお知らせください。"
         />
-        <p class="access__faq-mail small font-en">{SITE.contactEmail}</p>
       </div>
       <Faq groups={FAQ_GROUPS} />
     </div>
@@ -275,12 +273,6 @@ import { SITE } from '../../data/site';
     display: grid;
     gap: var(--sp-m);
     align-content: start;
-  }
-
-  .access__faq-mail {
-    color: var(--fg-faint);
-    letter-spacing: 0.06em;
-    word-break: break-all;
   }
 
   @media (min-width: 48em) {
