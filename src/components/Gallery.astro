@@ -175,6 +175,29 @@ import { imageSource } from '../lib/images';
     font-size: var(--fs-label);
   }
 
+  /*
+   * 狭い画面では「高さを揃えて幅を比率で変える」方式だと、横長の写真が
+   * カード高さの半分ほどにしかならず上下に大きな余白が出る。
+   * スマホでは幅を揃えて正方形に切り、写真を主役の大きさに戻す。
+   */
+  @media (max-width: 47.99em) {
+    .gallery__item {
+      block-size: auto;
+      inline-size: min(84vw, 21rem);
+    }
+
+    /* button は既定で shrink-to-fit のため、明示的に親幅まで広げる */
+    .gallery__button {
+      inline-size: 100%;
+    }
+
+    .gallery__img {
+      inline-size: 100%;
+      block-size: auto;
+      aspect-ratio: 1 / 1;
+    }
+  }
+
   /* ---- ライトボックス ---- */
   .lightbox {
     inline-size: min(100vw, 1400px);

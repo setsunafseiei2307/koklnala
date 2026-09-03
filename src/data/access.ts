@@ -37,7 +37,7 @@ export const ACCESS_ROUTES: readonly AccessRoute[] = [
 ] as const;
 
 export const AREA_NOTES: readonly { label: string; value: string }[] = [
-  { label: 'エリア', value: '神奈川県 箱根・仙石原（想定）' },
+  { label: 'エリア', value: '神奈川県 足柄下郡箱根町 仙石原' },
   { label: '標高', value: '約 700m' },
   { label: '棟数', value: '3 棟 / 1 日 3 組' },
   { label: 'チェックイン', value: '15:00 – 19:00' },

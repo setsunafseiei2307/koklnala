@@ -9,7 +9,7 @@ const from = Math.min(...Object.values(VILLA_BASE_RATE)).toLocaleString('ja-JP')
 
 <Base
   title="BOOKING / 宿泊予約"
-  description="日程・人数・ヴィラ・食事を選ぶと、EMBER & MOSS の宿泊料金の概算がその場で表示されます。1 泊 2 名 68,000 円〜。架空施設のコンセプトサイトのため、実際の予約は送信されません。"
+  description="日程・人数・ヴィラ・食事を選ぶと、EMBER & MOSS の宿泊料金がその場で表示されます。1 泊 2 名 68,000 円〜。全 3 棟・1 日 3 組限定。"
   showBookingBar={false}
 >
   <section class="bhead" aria-labelledby="booking-title">
@@ -35,9 +35,7 @@ const from = Math.min(...Object.values(VILLA_BASE_RATE)).toLocaleString('ja-JP')
       </dl>
 
       <p class="bhead__notice small">
-        <span class="label label--accent">{SITE.conceptNotice.label}</span>
-        <span>{SITE.conceptNotice.short}空室状況・料金はすべて架空の設定で、実際の予約・決済は行われません。</span>
-        <a class="bhead__notice-link" href="/project/">この制作について</a>
+        <span>ご予約の確定前に、料金の内訳とキャンセルポリシーをご確認いただけます。お支払いは事前決済、入湯税のみ現地でのお支払いです。</span>
       </p>
     </div>
   </section>
@@ -122,21 +120,6 @@ const from = Math.min(...Object.values(VILLA_BASE_RATE)).toLocaleString('ja-JP')
   .bhead__facts dd {
     margin: 0;
     font-size: var(--fs-small);
-  }
-
-  .bhead__notice-link {
-    justify-self: start;
-    display: inline-flex;
-    align-items: center;
-    min-block-size: var(--tap-min);
-    border-block-end: 1px solid var(--line-strong);
-    padding-block-end: 2px;
-    color: var(--fg-muted);
-    transition: color var(--dur-fast) var(--ease-out);
-  }
-
-  .bhead__notice-link:hover {
-    color: var(--c-ember-bright);
   }
 
   .bhead__notice {

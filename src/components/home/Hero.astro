@@ -39,11 +39,6 @@ const hero = getImage('hero');
     </div>
   </div>
 
-  <p class="hero__concept">
-    <span class="label label--accent">{SITE.conceptNotice.label}</span>
-    <span class="hero__concept-text">{SITE.conceptNotice.short}</span>
-  </p>
-
   <a class="hero__scroll" href="#intro" aria-label="次のセクションへ進む">
     <span class="label">SCROLL</span>
     <span class="hero__scroll-line" aria-hidden="true"></span>
@@ -97,7 +92,7 @@ const hero = getImage('hero');
   }
 
   .hero__inner {
-    padding-block: 0 clamp(7rem, 14vh, 10rem);
+    padding-block: 0 clamp(4.5rem, 11vh, 7rem);
     display: grid;
     gap: clamp(1.25rem, 3vw, 2rem);
     justify-items: start;
@@ -147,23 +142,6 @@ const hero = getImage('hero');
   .hero__actions .btn {
     flex: 1 1 auto;
     min-inline-size: 13.5rem;
-  }
-
-  .hero__concept {
-    position: absolute;
-    inset-block-end: clamp(1.5rem, 4vh, 2.5rem);
-    inset-inline-start: var(--page-gutter);
-    display: grid;
-    gap: 0.2rem;
-    max-inline-size: 20rem;
-    padding-inline-start: 0.9rem;
-    border-inline-start: 1px solid rgba(184, 118, 67, 0.5);
-  }
-
-  .hero__concept-text {
-    font-size: 0.6875rem;
-    line-height: 1.7;
-    color: rgba(236, 231, 221, 0.62);
   }
 
   .hero__scroll {
@@ -220,27 +198,11 @@ const hero = getImage('hero');
     .hero__scroll {
       display: inline-flex;
     }
-
-    .hero__concept {
-      max-inline-size: 24rem;
-    }
   }
 
   @media (min-width: 62em) {
     .hero__inner {
-      padding-block-end: clamp(8rem, 18vh, 12rem);
-    }
-
-    .hero__concept {
-      inset-inline-start: auto;
-      inset-inline-end: var(--page-gutter);
-      inset-block-end: auto;
-      inset-block-start: calc(var(--header-h) + 2.5rem);
-      text-align: right;
-      padding-inline: 0 0.9rem;
-      border-inline-start: none;
-      border-inline-end: 1px solid rgba(184, 118, 67, 0.5);
-      justify-items: end;
+      padding-block-end: clamp(6.5rem, 15vh, 10rem);
     }
   }
 

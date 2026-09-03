@@ -120,7 +120,7 @@ const steps = [
             <span class="bk__vacancy-summary" data-vacancy-summary></span>
           </p>
           <ul class="bk__vacancy-list" data-vacancy-list></ul>
-          <p class="bk__vacancy-note small">空室状況はデモ用の架空データです（日付ごとに固定の結果を返します）。</p>
+          <p class="bk__vacancy-note small">空室は仮押さえされません。次の画面へ進むと、選んだ日程で棟をお選びいただけます。</p>
         </div>
         <p class="bk__error small" data-error="vacancy" role="alert"></p>
       </section>
@@ -309,16 +309,16 @@ const steps = [
 
         <p class="bk__notice">
           <span class="label label--accent">{SITE.conceptNotice.label}</span>
-          {SITE.conceptNotice.label} のため、実際の予約は送信されません。入力内容がサーバーへ送られることはありません。
+          {SITE.conceptNotice.booking}
         </p>
       </section>
 
       <!-- 完了パネル -->
       <section class="bk__done" data-done hidden aria-live="polite">
-        <p class="label label--accent">DEMO COMPLETE</p>
-        <h2 class="bk__done-title font-mincho">この画面で予約フローは完了です。</h2>
+        <p class="label label--accent">{SITE.conceptNotice.label}</p>
+        <h2 class="bk__done-title font-mincho">ここまでが、予約の流れです。</h2>
         <p class="body">
-          実際のサービスであれば、ここで予約確認メールが送信されます。EMBER &amp; MOSS は自主制作のコンセプトプロジェクトのため、入力内容は送信も保存もされません。
+          実際の宿であれば、この時点で予約確認メールが届きます。EMBER &amp; MOSS は Web 制作の自主制作のため、入力内容は送信も保存もされていません。
         </p>
         <dl class="bk__review" data-done-review></dl>
         <div class="bk__done-actions">
@@ -375,7 +375,7 @@ const steps = [
       </p>
 
       <p class="bk__summary-note small">
-        料金はすべて架空の設定です。入湯税のみ現地精算を想定しています。
+        表示は税・サービス料込みです。入湯税（1 名 1 泊 150 円）のみ現地でのお支払いになります。
       </p>
     </aside>
   </div>

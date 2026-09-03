@@ -75,10 +75,11 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     </nav>
 
     <div class="menu__foot">
-      <p class="menu__notice small">
-        <span class="label label--accent">{SITE.conceptNotice.label}</span>
-        {SITE.conceptNotice.short}
-      </p>
+      <dl class="menu__facts small">
+        <div><dt class="label">CHECK IN</dt><dd class="num">{SITE.checkIn}</dd></div>
+        <div><dt class="label">CHECK OUT</dt><dd class="num">{SITE.checkOut}</dd></div>
+        <div><dt class="label">VILLAS</dt><dd>{SITE.rooms}</dd></div>
+      </dl>
       <a class="btn btn--primary btn--block" href="/booking/">
         <span class="btn__label">空室・料金を見る</span>
       </a>
@@ -116,6 +117,15 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
   .header[data-state='hidden'] {
     translate: 0 -100%;
     transition: translate var(--dur-base) var(--ease-out);
+  }
+
+  /*
+   * メニューは全画面（--z-menu）なので、そのままだとヘッダーの閉じるボタンを
+   * 覆ってしまい、開いたメニューを閉じられなくなる。展開中だけ前面に出す。
+   */
+  .header[data-menu-open] {
+    z-index: calc(var(--z-menu) + 1);
+    translate: none;
   }
 
   .header__inner {
@@ -372,10 +382,31 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     gap: var(--sp-m);
   }
 
-  .menu__notice {
+  .menu__facts {
     display: grid;
-    gap: 0.35rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-s);
+    margin: 0;
+    padding-block-end: var(--sp-s);
+    border-block-end: 1px solid var(--line);
+  }
+
+  .menu__facts div {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  /* 棟数は文字数が多いため 1 行使う */
+  .menu__facts div:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .menu__facts dt {
     color: var(--fg-faint);
+  }
+
+  .menu__facts dd {
+    margin: 0;
   }
 
   @media (min-width: 62em) {

@@ -20,7 +20,7 @@ export const SAUNA_ELEMENTS: readonly SaunaElement[] = [
     label: 'WATER',
     labelJa: '水',
     value: '12 – 15℃',
-    body: '井戸から汲み上げた水を、循環させずに掛け流します。夏でも 15℃を超えない想定。肩まで沈めても呼吸が乱れない温度です。',
+    body: '井戸から汲み上げた水を、循環させずに掛け流します。夏でも 15℃ を超えません。肩まで沈めても呼吸が乱れない温度です。',
   },
   {
     key: 'air',
@@ -90,7 +90,7 @@ export const SAUNA_SPECS: readonly { label: string; value: string }[] = [
   { label: 'ロウリュ', value: 'セルフロウリュ可。柄杓・桶・アロマ水を常備' },
   { label: '室温', value: '90 – 100℃（薪は火の入れ方で調整可能）' },
   { label: '定員', value: '3 – 4 名（棟により異なる）' },
-  { label: '水風呂', value: '井戸水掛け流し・12 – 15℃想定。STONE / MIST は屋外' },
+  { label: '水風呂', value: '井戸水掛け流し・12 – 15℃。STONE / MIST は屋外' },
   { label: '外気浴', value: 'デッキまたはテラスにチェア。ブランケット常備' },
   { label: '利用時間', value: '15:00 – 24:00 / 翌 6:00 – 10:00' },
   { label: '料金', value: '宿泊料金に含む（FOREST の薪アップグレードのみ +8,000円 / 泊）' },
